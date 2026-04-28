@@ -66,7 +66,11 @@ export default function RecentPayments({ subscriptionId }: { subscriptionId?: st
                 </Link>
             </div>
 
-            <div style={{ overflowX: 'auto' }}>
+            <div className="recent-payments-table" style={{ 
+                overflowX: 'auto',
+                scrollbarWidth: 'thin',
+                scrollbarColor: '#1f2937 transparent'
+            }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }} role="table" aria-label="Recent payments table">
                     <thead>
                         <tr style={{ borderBottom: '1px solid #1f2937' }}>
@@ -175,6 +179,8 @@ export default function RecentPayments({ subscriptionId }: { subscriptionId?: st
           0%, 100% { opacity: 1; }
           50% { opacity: .5; }
         }
+        .recent-payments-table::-webkit-scrollbar { height: 6px; }
+        .recent-payments-table::-webkit-scrollbar-thumb { background-color: #1f2937; border-radius: 10px; }
       `}} />
         </div>
     );

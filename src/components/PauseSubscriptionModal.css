@@ -14,14 +14,27 @@
 .pause-modal-content {
   background-color: #0d0d0d;
   border-radius: 28px;
-  width: 100%;
+  width: calc(100% - 2rem);
   max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
   position: relative;
   padding: 48px 32px 32px;
   border: 1px solid #1a1a1a;
   color: #ffffff;
   box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.7);
   animation: modal-fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  scrollbar-width: thin;
+  scrollbar-color: #1a1a1a transparent;
+}
+
+.pause-modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pause-modal-content::-webkit-scrollbar-thumb {
+  background-color: #1a1a1a;
+  border-radius: 10px;
 }
 
 @keyframes modal-fade-in {
