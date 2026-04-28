@@ -18,17 +18,8 @@ interface Plan {
 	icon: "newspaper" | "cloud" | "robot" | "muscle" | "fitness" | "chart";
 }
 
-// Icon Components
 const NewspaperIcon = () => (
-	<svg
-		width="32"
-		height="32"
-		viewBox="0 0 24 24"
-		fill="none"
-		stroke="currentColor"
-		strokeWidth="2"
-		strokeLinecap="round"
-		strokeLinejoin="round">
+	<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 		<path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" />
 		<path d="M18 14h-8" />
 		<path d="M15 18h-5" />
@@ -37,29 +28,13 @@ const NewspaperIcon = () => (
 );
 
 const CloudIcon = () => (
-	<svg
-		width="32"
-		height="32"
-		viewBox="0 0 24 24"
-		fill="none"
-		stroke="currentColor"
-		strokeWidth="2"
-		strokeLinecap="round"
-		strokeLinejoin="round">
+	<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 		<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
 	</svg>
 );
 
 const RobotIcon = () => (
-	<svg
-		width="32"
-		height="32"
-		viewBox="0 0 24 24"
-		fill="none"
-		stroke="currentColor"
-		strokeWidth="2"
-		strokeLinecap="round"
-		strokeLinejoin="round">
+	<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 		<rect width="18" height="10" x="3" y="11" rx="2" />
 		<circle cx="12" cy="5" r="2" />
 		<path d="M12 7v4" />
@@ -69,15 +44,7 @@ const RobotIcon = () => (
 );
 
 const MuscleIcon = () => (
-	<svg
-		width="32"
-		height="32"
-		viewBox="0 0 24 24"
-		fill="none"
-		stroke="currentColor"
-		strokeWidth="2"
-		strokeLinecap="round"
-		strokeLinejoin="round">
+	<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 		<path d="M12.5 3.5a3 3 0 0 1 0 6M13.5 3.5a3 3 0 0 0 0 6" />
 		<path d="M13.5 9.5V14" />
 		<path d="M12.5 14v5.5a3 3 0 0 1-6 0v-2c0-1.7 1.3-3 3-3 1.7 0 3-1.3 3-3Z" />
@@ -85,15 +52,7 @@ const MuscleIcon = () => (
 );
 
 const FitnessIcon = () => (
-	<svg
-		width="32"
-		height="32"
-		viewBox="0 0 24 24"
-		fill="none"
-		stroke="currentColor"
-		strokeWidth="2"
-		strokeLinecap="round"
-		strokeLinejoin="round">
+	<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 		<path d="m14 7 6-3v18l-6-3" />
 		<path d="M4 4v16" />
 		<path d="M10 7l-6-3v18l6-3" />
@@ -101,15 +60,7 @@ const FitnessIcon = () => (
 );
 
 const ChartIcon = () => (
-	<svg
-		width="32"
-		height="32"
-		viewBox="0 0 24 24"
-		fill="none"
-		stroke="currentColor"
-		strokeWidth="2"
-		strokeLinecap="round"
-		strokeLinejoin="round">
+	<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 		<path d="M3 3v18h18" />
 		<path d="m19 9-5 5-4-4-3 3" />
 	</svg>
@@ -124,7 +75,6 @@ const iconMap = {
 	chart: ChartIcon,
 };
 
-// Mock data matching design requirements
 const mockPlans: Plan[] = [
 	{
 		id: "1",
@@ -194,7 +144,26 @@ const mockPlans: Plan[] = [
 	},
 ];
 
-// Plan Card Component
+function getBillingIntervalCopy(interval: PlanInterval) {
+	return interval === "Monthly" ? "Billed every month" : "Billed every year";
+}
+
+function getNextChargeDate(interval: PlanInterval) {
+	const nextCharge = new Date();
+
+	if (interval === "Monthly") {
+		nextCharge.setMonth(nextCharge.getMonth() + 1);
+	} else {
+		nextCharge.setFullYear(nextCharge.getFullYear() + 1);
+	}
+
+	return nextCharge.toLocaleDateString(undefined, {
+		year: "numeric",
+		month: "short",
+		day: "numeric",
+	});
+}
+
 interface PlanCardProps {
 	plan: Plan;
 	onSubscribe: (plan: Plan) => void;
@@ -203,6 +172,8 @@ interface PlanCardProps {
 function PlanCard({ plan, onSubscribe }: PlanCardProps) {
 	const IconComponent = iconMap[plan.icon];
 	const [isHovered, setIsHovered] = useState(false);
+	const billingCopy = getBillingIntervalCopy(plan.interval);
+	const nextChargeDate = getNextChargeDate(plan.interval);
 
 	return (
 		<article
@@ -223,7 +194,6 @@ function PlanCard({ plan, onSubscribe }: PlanCardProps) {
 					: "0 4px 6px rgba(0, 0, 0, 0.1)",
 				transform: isHovered ? "translateY(-4px)" : "translateY(0)",
 			}}>
-			{/* Icon and Merchant */}
 			<div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
 				<div
 					style={{
@@ -245,7 +215,6 @@ function PlanCard({ plan, onSubscribe }: PlanCardProps) {
 				</span>
 			</div>
 
-			{/* Plan Name */}
 			<h3
 				style={{
 					color: "#ffffff",
@@ -257,22 +226,30 @@ function PlanCard({ plan, onSubscribe }: PlanCardProps) {
 				{plan.name}
 			</h3>
 
-			{/* Price */}
-			<div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
-				<span
-					style={{
-						color: "#ffffff",
-						fontSize: "36px",
-						fontWeight: 800,
-					}}>
-					{plan.price}
-				</span>
-				<span style={{ color: "#8b949e", fontSize: "16px", fontWeight: 500 }}>
-					{plan.currency} / {plan.interval === "Monthly" ? "mo" : "yr"}
-				</span>
+			<div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+				<div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
+					<span
+						style={{
+							color: "#ffffff",
+							fontSize: "36px",
+							fontWeight: 800,
+						}}>
+						{plan.price}
+					</span>
+					<span style={{ color: "#8b949e", fontSize: "16px", fontWeight: 500 }}>
+						{plan.currency}
+					</span>
+				</div>
+				<p style={{ color: "#8b949e", fontSize: "14px", margin: 0 }}>
+					{billingCopy}
+				</p>
+				<p
+					aria-label={`Next charge preview for ${plan.name}`}
+					style={{ color: "#4FD1C5", fontSize: "14px", fontWeight: 600, margin: 0 }}>
+					Next charge: {nextChargeDate}
+				</p>
 			</div>
 
-			{/* Description */}
 			<p
 				style={{
 					color: "#8b949e",
@@ -288,7 +265,6 @@ function PlanCard({ plan, onSubscribe }: PlanCardProps) {
 				{plan.description}
 			</p>
 
-			{/* Subscribe Button */}
 			<button
 				onClick={() => onSubscribe(plan)}
 				style={{
@@ -317,29 +293,25 @@ function PlanCard({ plan, onSubscribe }: PlanCardProps) {
 				onBlur={(e) => {
 					e.currentTarget.style.outline = "none";
 				}}
-				aria-label={`Subscribe to ${plan.name} plan for ${plan.price} ${plan.currency} per ${plan.interval === "Monthly" ? "month" : "year"} from ${plan.merchant}`}>
+				aria-label={`Subscribe to ${plan.name} plan for ${plan.price} ${plan.currency}. ${billingCopy}. Next charge on ${nextChargeDate} from ${plan.merchant}`}>
 				Subscribe
 			</button>
 		</article>
 	);
 }
 
-// Main BrowsePlans Component
 export default function BrowsePlans() {
 	const navigate = useNavigate();
 	const [plans, setPlans] = useState<Plan[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [searchQuery, setSearchQuery] = useState("");
-	const [intervalFilter, setIntervalFilter] = useState<PlanInterval | "All">(
-		"All",
-	);
+	const [intervalFilter, setIntervalFilter] = useState<PlanInterval | "All">("All");
 	const [sortField, setSortField] = useState<SortField>("name");
 	const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 	const [isWalletConnected, setIsWalletConnected] = useState(false);
 	const [walletModalOpen, setWalletModalOpen] = useState(false);
 
-	// Fetch plans from API
 	useEffect(() => {
 		const fetchPlans = async () => {
 			try {
@@ -350,30 +322,30 @@ export default function BrowsePlans() {
 			} catch (err) {
 				setError("Failed to load plans");
 				console.error("Error fetching plans:", err);
-				// Fallback to mock data on error
 				setPlans(mockPlans);
 			} finally {
 				setLoading(false);
 			}
 		};
+
 		fetchPlans();
 	}, []);
 
-	// Filtered and sorted plans
 	const filteredPlans = useMemo(() => {
-		let result = plans.filter((plan) => {
+		const result = plans.filter((plan) => {
 			const matchesSearch =
 				plan.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
 				plan.merchant.toLowerCase().includes(searchQuery.toLowerCase()) ||
 				plan.description.toLowerCase().includes(searchQuery.toLowerCase());
 			const matchesInterval =
 				intervalFilter === "All" || plan.interval === intervalFilter;
+
 			return matchesSearch && matchesInterval;
 		});
 
-		// Sort
 		result.sort((a, b) => {
 			let comparison = 0;
+
 			if (sortField === "name") {
 				comparison = a.name.localeCompare(b.name);
 			} else if (sortField === "price") {
@@ -381,6 +353,7 @@ export default function BrowsePlans() {
 			} else if (sortField === "merchant") {
 				comparison = a.merchant.localeCompare(b.merchant);
 			}
+
 			return sortDirection === "asc" ? comparison : -comparison;
 		});
 
@@ -401,7 +374,7 @@ export default function BrowsePlans() {
 			setWalletModalOpen(true);
 			return;
 		}
-		// Navigate to checkout/subscribe flow
+
 		navigate(`/checkout/${plan.id}`);
 	};
 
@@ -420,7 +393,6 @@ export default function BrowsePlans() {
 	return (
 		<div style={{ padding: "2rem", background: "#0a0a0a", minHeight: "100vh" }}>
 			<div style={{ maxWidth: 1280, margin: "0 auto" }}>
-				{/* Header */}
 				<div style={{ marginBottom: "2rem" }}>
 					<h1
 						style={{
@@ -436,7 +408,6 @@ export default function BrowsePlans() {
 					</p>
 				</div>
 
-				{/* Filters and Sort */}
 				<div
 					style={{
 						display: "flex",
@@ -445,7 +416,6 @@ export default function BrowsePlans() {
 						flexWrap: "wrap",
 						alignItems: "center",
 					}}>
-					{/* Search */}
 					<div style={{ flex: "1 1 300px", position: "relative" }}>
 						<svg
 							style={{
@@ -493,7 +463,6 @@ export default function BrowsePlans() {
 						/>
 					</div>
 
-					{/* Interval Filter */}
 					<select
 						value={intervalFilter}
 						onChange={(e) =>
@@ -511,13 +480,12 @@ export default function BrowsePlans() {
 						}}
 						onFocus={(e) => (e.currentTarget.style.borderColor = "#22d3ee")}
 						onBlur={(e) => (e.currentTarget.style.borderColor = "#2a2a2a")}
-						aria-label="Filter plans by billing interval (Monthly or Yearly)">
-						<option value="All">All Plans</option>
-						<option value="Monthly">Monthly</option>
-						<option value="Yearly">Yearly</option>
+						aria-label="Filter plans by billing interval">
+						<option value="All">All billing intervals</option>
+						<option value="Monthly">Billed every month</option>
+						<option value="Yearly">Billed every year</option>
 					</select>
 
-					{/* Sort */}
 					<div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
 						<span style={{ color: "#94a3b8", fontSize: "0.875rem" }}>
 							Sort by:
@@ -569,7 +537,6 @@ export default function BrowsePlans() {
 					</div>
 				</div>
 
-				{/* Results count */}
 				<div style={{ marginBottom: "1.5rem" }}>
 					<span style={{ color: "#64748b", fontSize: "0.875rem" }}>
 						{filteredPlans.length}{" "}
@@ -577,7 +544,6 @@ export default function BrowsePlans() {
 					</span>
 				</div>
 
-				{/* Loading State */}
 				{loading && (
 					<div
 						style={{
@@ -598,26 +564,20 @@ export default function BrowsePlans() {
 								animation: "spin 1s linear infinite",
 							}}
 						/>
-						<h2
-							style={{
-								color: "#ffffff",
-								fontSize: "1.5rem",
-								margin: "0 0 0.5rem",
-							}}>
+						<h2 style={{ color: "#ffffff", fontSize: "1.5rem", margin: "0 0 0.5rem" }}>
 							Loading plans...
 						</h2>
 						<p style={{ color: "#94a3b8", margin: 0 }}>
 							Please wait while we fetch available subscription plans
 						</p>
 						<style>{`
-              @keyframes spin {
-                to { transform: rotate(360deg); }
-              }
-            `}</style>
+							@keyframes spin {
+								to { transform: rotate(360deg); }
+							}
+						`}</style>
 					</div>
 				)}
 
-				{/* Error State */}
 				{error && !loading && (
 					<div
 						style={{
@@ -628,38 +588,7 @@ export default function BrowsePlans() {
 							border: "1px solid #ef4444",
 							borderLeftWidth: "4px",
 						}}>
-						<div
-							style={{
-								width: 64,
-								height: 64,
-								margin: "0 auto 1.5rem",
-								borderRadius: "50%",
-								background: "rgba(239, 68, 68, 0.1)",
-								display: "flex",
-								alignItems: "center",
-								justifyContent: "center",
-								color: "#ef4444",
-							}}>
-							<svg
-								width="32"
-								height="32"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								strokeWidth="2"
-								strokeLinecap="round"
-								strokeLinejoin="round">
-								<circle cx="12" cy="12" r="10" />
-								<line x1="12" y1="8" x2="12" y2="12" />
-								<line x1="12" y1="16" x2="12.01" y2="16" />
-							</svg>
-						</div>
-						<h2
-							style={{
-								color: "#ffffff",
-								fontSize: "1.5rem",
-								margin: "0 0 0.5rem",
-							}}>
+						<h2 style={{ color: "#ffffff", fontSize: "1.5rem", margin: "0 0 0.5rem" }}>
 							{error}
 						</h2>
 						<p style={{ color: "#94a3b8", margin: "0 0 1.5rem" }}>
@@ -682,7 +611,6 @@ export default function BrowsePlans() {
 					</div>
 				)}
 
-				{/* Grid or Empty State */}
 				{!loading &&
 					(filteredPlans.length > 0 ? (
 						<div
@@ -694,15 +622,13 @@ export default function BrowsePlans() {
 								gap: "24px 32px",
 							}}>
 							{filteredPlans.map((plan) => (
-								<PlanCard
-									key={plan.id}
-									plan={plan}
-									onSubscribe={handleSubscribe}
-								/>
+								<PlanCard key={plan.id} plan={plan} onSubscribe={handleSubscribe} />
 							))}
 						</div>
 					) : (
 						<div
+							role="status"
+							aria-live="polite"
 							style={{
 								textAlign: "center",
 								padding: "4rem 2rem",
@@ -710,37 +636,7 @@ export default function BrowsePlans() {
 								borderRadius: 12,
 								border: "1px solid #2a2a2a",
 							}}>
-							<div
-								style={{
-									width: 64,
-									height: 64,
-									margin: "0 auto 1.5rem",
-									borderRadius: "50%",
-									background: "rgba(34, 211, 238, 0.1)",
-									display: "flex",
-									alignItems: "center",
-									justifyContent: "center",
-									color: "#22d3ee",
-								}}>
-								<svg
-									width="32"
-									height="32"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round">
-									<circle cx="11" cy="11" r="8" />
-									<path d="m21 21-4.3-4.3" />
-								</svg>
-							</div>
-							<h2
-								style={{
-									color: "#ffffff",
-									fontSize: "1.5rem",
-									margin: "0 0 0.5rem",
-								}}>
+							<h2 style={{ color: "#ffffff", fontSize: "1.5rem", margin: "0 0 0.5rem" }}>
 								No plans match your filters
 							</h2>
 							<p style={{ color: "#94a3b8", margin: "0 0 1.5rem" }}>
@@ -750,8 +646,7 @@ export default function BrowsePlans() {
 								onClick={clearFilters}
 								style={{
 									padding: "0.75rem 1.5rem",
-									background:
-										"linear-gradient(135deg, #3b82f6 0%, #10b981 100%)",
+									background: "linear-gradient(135deg, #3b82f6 0%, #10b981 100%)",
 									color: "#ffffff",
 									fontSize: "0.875rem",
 									fontWeight: 600,
@@ -764,7 +659,6 @@ export default function BrowsePlans() {
 						</div>
 					))}
 
-				{/* Wallet Connect Modal */}
 				<WalletConnectModal
 					isOpen={walletModalOpen}
 					onClose={() => setWalletModalOpen(false)}
