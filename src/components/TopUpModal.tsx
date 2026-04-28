@@ -1,5 +1,5 @@
-/** @jsxImportSource react */
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { useModalFocus } from "../hooks/useModalFocus";
 import "./TopUpModal.css";
 
 interface TopUpModalProps {
@@ -22,16 +22,9 @@ export default function TopUpModal({ isOpen, onClose }: TopUpModalProps) {
   const walletBalance = 150;
 
   const modalRef = useRef<HTMLDivElement>(null);
+  const initialFocusRef = useRef<HTMLInputElement>(null);
 
-  // Close on Escape
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
+  useModalFocus(modalRef, { isOpen, onClose, initialFocusRef });
 
   const handleQuickSelect = (id: string, val: number) => {
     setSelectedQs(id);
@@ -68,6 +61,10 @@ export default function TopUpModal({ isOpen, onClose }: TopUpModalProps) {
     <div
       className="topup-modal-overlay"
       onClick={(e) => e.target === e.currentTarget && onClose()}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="topup-modal-title"
+      aria-describedby="topup-modal-description"
     >
       <div className="topup-modal-content" ref={modalRef}>
         <div className="topup-modal-header">
@@ -87,8 +84,8 @@ export default function TopUpModal({ isOpen, onClose }: TopUpModalProps) {
                 <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
               </svg>
             </div>
-            <h2 className="topup-modal-title">Top up balance</h2>
-            <p className="topup-modal-subtitle">
+            <h2 id="topup-modal-title" className="topup-modal-title">Top up balance</h2>
+            <p id="topup-modal-description" className="topup-modal-subtitle">
               Add USDC to your prepaid balance for{" "}
               <strong>Premium Access</strong>
             </p>
@@ -143,6 +140,7 @@ export default function TopUpModal({ isOpen, onClose }: TopUpModalProps) {
             <div className="amount-input-wrapper">
               <span className="currency-symbol">$</span>
               <input
+                ref={initialFocusRef}
                 type="text"
                 className="amount-input"
                 value={amount}

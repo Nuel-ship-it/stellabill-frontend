@@ -5,7 +5,7 @@
    align-items: center;
    background: transparent;
  }
- 
+
  .pill {
    display: inline-flex;
    align-items: center;
@@ -21,7 +21,7 @@
      0 10px 40px rgba(34, 211, 238, 0.12),
      inset 0 1px 0 rgba(255, 255, 255, 0.06);
  }
- 
+
  .quote {
    margin: 0;
    text-align: center;
@@ -32,13 +32,13 @@
    font-size: clamp(1.125rem, 3.2vw, 2rem);
    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
  }
- 
+
  .billing {
    position: relative;
    color: #ffffff;
    text-decoration: none;
  }
- 
+
  .billing::after {
    content: "";
    position: absolute;
@@ -49,10 +49,11 @@
    background: #22d3ee;
    border-radius: 2px;
  }
- 
+
  @media (max-width: 640px) {
    .pill {
      padding: 1rem 1.25rem;
    }
  }
-*** End Patch```} />
+
+ /* *** End Patch```} /> */
