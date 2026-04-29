@@ -87,12 +87,15 @@
 
 .container_scroll_overflow {
   overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #ffffff33 transparent;
 }
 
 .container_scroll_overflow::-webkit-scrollbar {
-  display: none;
+  height: 6px;
 }
 
-.container_scroll_overflow {
-  scrollbar-width: none;
+.container_scroll_overflow::-webkit-scrollbar-thumb {
+  background-color: #ffffff33;
+  border-radius: 10px;
 }
