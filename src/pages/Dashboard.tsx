@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Users, 
@@ -14,18 +14,62 @@ import RevenueChart from '../components/RevenueChart';
 import DashboardCard from '../components/Dashboard/DashboardCard';
 import ActivityList, { ActivityType } from '../components/Dashboard/ActivityList';
 import DashboardSkeleton from '../components/Dashboard/DashboardSkeleton';
+import ErrorState from '../components/ErrorState';
+import { ApiError } from '../api/client';
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<ApiError | null>(null);
 
-  // Simulate loading
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 800);
-    return () => clearTimeout(timer);
+  const fetchDashboardData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Simulate API call
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          if (window.location.search.includes('simulate_error')) {
+            const err: ApiError = new Error('Failed to fetch dashboard metrics');
+            err.status = 500;
+            err.technicalDetails = 'The metrics service is currently unavailable. [Error Code: MET-500]';
+            reject(err);
+          } else if (window.location.search.includes('simulate_offline')) {
+            const err: ApiError = new Error('No internet connection');
+            err.isOffline = true;
+            reject(err);
+          } else {
+            resolve(true);
+          }
+        }, 1000);
+      });
+      setLoading(false);
+    } catch (err: any) {
+      setError(err);
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
   if (loading) {
     return <DashboardSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#020617] flex items-center justify-center p-4">
+        <ErrorState 
+          title="Dashboard Unavailable"
+          message={error.message}
+          technicalDetails={error.technicalDetails}
+          onRetry={fetchDashboardData}
+          isRetrying={loading}
+          type={error.isOffline ? 'offline' : 'error'}
+        />
+      </div>
+    );
   }
 
   const mockActivities = [
