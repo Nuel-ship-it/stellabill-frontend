@@ -1,4 +1,7 @@
 import "./prepaidCard.css";
+import Amount from "./common/Amount";
+import { formatAmount } from "../utils/amount";
+
 export const DollarIcon = ({ size = 20, color = "#00D3F2" }) => {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width={`${size}`} height={`${size}`} viewBox="0 0 20 20" fill="none">
@@ -10,8 +13,10 @@ export const DollarIcon = ({ size = 20, color = "#00D3F2" }) => {
 
 
 export default function PrepaidBalanceCard({ balance = 30, maxBalance = 30, paymentAmount = 10, onTopUp }: {balance:number, maxBalance:number, paymentAmount:number, onTopUp:()=>void}) {
-    const payments = Math.floor(balance / paymentAmount);
-    const fillPct = Math.min((balance / maxBalance) * 100, 100);
+    const payments = paymentAmount > 0 ? Math.floor(balance / paymentAmount) : 0;
+    const fillPct = maxBalance > 0 ? Math.min((balance / maxBalance) * 100, 100) : 0;
+    const balanceLabel = formatAmount(balance, { minPrecision: 0 }).display;
+    const maxLabel = formatAmount(maxBalance, { minPrecision: 0 }).display;
 
     return (
             <div className="prepaid-card">
@@ -24,8 +29,13 @@ export default function PrepaidBalanceCard({ balance = 30, maxBalance = 30, paym
 
                 <div className="prepaid-card__balance-section">
                     <div className="prepaid-card__balance-row">
-                        <span className="prepaid-card__balance-number">{balance}</span>
-                        <span className="prepaid-card__balance-currency">USDC</span>
+                        <Amount
+                            value={balance}
+                            minPrecision={0}
+                            numberClassName="prepaid-card__balance-number"
+                            codeClassName="prepaid-card__balance-currency"
+                            data-testid="prepaid-balance-amount"
+                        />
                     </div>
 
                     <span className="prepaid-card__coverage">
@@ -39,13 +49,21 @@ export default function PrepaidBalanceCard({ balance = 30, maxBalance = 30, paym
                             aria-valuenow={balance}
                             aria-valuemin={0}
                             aria-valuemax={maxBalance}
-                            aria-label={`Balance: ${balance} USDC out of ${maxBalance} USDC`}
+                            aria-label={`Balance: ${balanceLabel} out of ${maxLabel}`}
                         >
                             <div className="prepaid-card__progress-fill" style={{ width: `${fillPct}%` }} />
                         </div>
                         <div className="prepaid-card__progress-labels">
-                            <span className="prepaid-card__progress-label">0 USDC</span>
-                            <span className="prepaid-card__progress-label">{maxBalance} USDC</span>
+                            <Amount
+                                value={0}
+                                minPrecision={0}
+                                className="prepaid-card__progress-label"
+                            />
+                            <Amount
+                                value={maxBalance}
+                                minPrecision={0}
+                                className="prepaid-card__progress-label"
+                            />
                         </div>
                     </div>
                 </div>
