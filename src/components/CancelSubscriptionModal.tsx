@@ -1,4 +1,5 @@
-import { useEffect, useRef, MouseEvent } from 'react';
+import { useRef, MouseEvent } from 'react';
+import { useModalFocus } from '../hooks/useModalFocus';
 import './CancelSubscriptionModal.css';
 
 interface CancelSubscriptionModalProps {
@@ -19,52 +20,9 @@ export default function CancelSubscriptionModal({
     endDate
 }: CancelSubscriptionModalProps) {
     const modalRef = useRef<HTMLDivElement>(null);
-    const previousFocusRef = useRef<HTMLElement | null>(null);
+    const initialFocusRef = useRef<HTMLButtonElement>(null);
 
-    useEffect(() => {
-        if (isOpen) {
-            previousFocusRef.current = document.activeElement as HTMLElement;
-            const timer = setTimeout(() => {
-                const firstBtn = modalRef.current?.querySelector('.cancel-btn-keep') as HTMLButtonElement;
-                firstBtn?.focus();
-            }, 50);
-            return () => clearTimeout(timer);
-        } else if (previousFocusRef.current) {
-            previousFocusRef.current.focus();
-        }
-    }, [isOpen]);
-
-    useEffect(() => {
-        if (!isOpen) return;
-
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') {
-                onClose();
-                return;
-            }
-
-            if (e.key === 'Tab') {
-                const focusable = modalRef.current?.querySelectorAll(
-                    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-                );
-                if (!focusable || focusable.length === 0) return;
-
-                const first = focusable[0] as HTMLElement;
-                const last = focusable[focusable.length - 1] as HTMLElement;
-
-                if (e.shiftKey && document.activeElement === first) {
-                    last.focus();
-                    e.preventDefault();
-                } else if (!e.shiftKey && document.activeElement === last) {
-                    first.focus();
-                    e.preventDefault();
-                }
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen, onClose]);
+    useModalFocus(modalRef, { isOpen, onClose, initialFocusRef });
 
     if (!isOpen) return null;
 
@@ -75,6 +33,7 @@ export default function CancelSubscriptionModal({
             role="dialog"
             aria-modal="true"
             aria-labelledby="cancel-modal-title"
+            aria-describedby="cancel-modal-description"
         >
             <div className="cancel-modal-content" ref={modalRef}>
                 <button
@@ -99,7 +58,7 @@ export default function CancelSubscriptionModal({
                 </div>
 
                 <h2 id="cancel-modal-title" className="cancel-title">Cancel subscription?</h2>
-                <p className="cancel-description">
+                <p id="cancel-modal-description" className="cancel-description">
                     You will no longer be charged. Your remaining prepaid balance ({balance} USDC) can be withdrawn to your wallet.
                 </p>
 
@@ -144,6 +103,7 @@ export default function CancelSubscriptionModal({
 
                 <div className="cancel-actions">
                     <button
+                        ref={initialFocusRef}
                         className="cancel-btn cancel-btn-keep"
                         onClick={onClose}
                         disabled={isLoading}

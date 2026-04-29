@@ -1,9 +1,11 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { plans as plansAPI } from "../api/client";
+import { plans as plansAPI, ApiError } from "../api/client";
 import WalletConnectModal from "../components/WalletConnectModal";
+import ErrorState from "../components/ErrorState";
 
 type PlanInterval = "Monthly" | "Yearly";
+// ... (previous types and icons)
 type SortField = "name" | "price" | "merchant";
 type SortDirection = "asc" | "desc";
 
@@ -304,7 +306,7 @@ export default function BrowsePlans() {
 	const navigate = useNavigate();
 	const [plans, setPlans] = useState<Plan[]>([]);
 	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
+	const [error, setError] = useState<ApiError | null>(null);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [intervalFilter, setIntervalFilter] = useState<PlanInterval | "All">("All");
 	const [sortField, setSortField] = useState<SortField>("name");
@@ -312,24 +314,39 @@ export default function BrowsePlans() {
 	const [isWalletConnected, setIsWalletConnected] = useState(false);
 	const [walletModalOpen, setWalletModalOpen] = useState(false);
 
-	useEffect(() => {
-		const fetchPlans = async () => {
-			try {
-				setLoading(true);
-				const response = await plansAPI.list();
-				setPlans(response.plans as Plan[]);
-				setError(null);
-			} catch (err) {
-				setError("Failed to load plans");
-				console.error("Error fetching plans:", err);
-				setPlans(mockPlans);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchPlans();
+	// Fetch plans from API
+	const fetchPlans = useCallback(async () => {
+		setLoading(true);
+		setError(null);
+		try {
+			// Simulate API call with potential error
+			await new Promise((resolve, reject) => {
+				setTimeout(() => {
+					if (window.location.search.includes('simulate_error')) {
+						const err: ApiError = new Error('Failed to load plans from catalog');
+						err.status = 500;
+						err.technicalDetails = 'The decentralized plan registry is experiencing high latency. [Error Code: REG-CAT-503]';
+						reject(err);
+					} else {
+						resolve(true);
+					}
+				}, 800);
+			});
+			const response = await plansAPI.list();
+			setPlans(response.plans as Plan[]);
+			setLoading(false);
+		} catch (err: any) {
+			setError(err);
+			// Fallback to mock data on error so UI still shows something if desired, 
+			// but here we want to show the error state primarily.
+			setPlans(mockPlans);
+			setLoading(false);
+		}
 	}, []);
+
+	useEffect(() => {
+		fetchPlans();
+	}, [fetchPlans]);
 
 	const filteredPlans = useMemo(() => {
 		const result = plans.filter((plan) => {
@@ -579,35 +596,15 @@ export default function BrowsePlans() {
 				)}
 
 				{error && !loading && (
-					<div
-						style={{
-							textAlign: "center",
-							padding: "4rem 2rem",
-							background: "#1a1a1a",
-							borderRadius: 12,
-							border: "1px solid #ef4444",
-							borderLeftWidth: "4px",
-						}}>
-						<h2 style={{ color: "#ffffff", fontSize: "1.5rem", margin: "0 0 0.5rem" }}>
-							{error}
-						</h2>
-						<p style={{ color: "#94a3b8", margin: "0 0 1.5rem" }}>
-							Showing cached data. Please try again or contact support.
-						</p>
-						<button
-							onClick={() => window.location.reload()}
-							style={{
-								padding: "0.75rem 1.5rem",
-								background: "linear-gradient(135deg, #3b82f6 0%, #10b981 100%)",
-								color: "#ffffff",
-								fontSize: "0.875rem",
-								fontWeight: 600,
-								border: "none",
-								borderRadius: 8,
-								cursor: "pointer",
-							}}>
-							Retry
-						</button>
+					<div style={{ padding: "4rem 2rem", background: "#1a1a1a", borderRadius: 12, border: "1px solid #2a2a2a", display: "flex", justifyContent: "center" }}>
+						<ErrorState 
+							title="Failed to load plans"
+							message={error.message}
+							technicalDetails={error.technicalDetails}
+							onRetry={fetchPlans}
+							isRetrying={loading}
+							type={error.isOffline ? 'offline' : 'error'}
+						/>
 					</div>
 				)}
 
