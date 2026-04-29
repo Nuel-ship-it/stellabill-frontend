@@ -1,14 +1,14 @@
-import CTACard from './CTACard.tsx'
+import CTACard, { CTACardVariant } from './CTACard.tsx'
 
 const DollarIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
     <line x1="12" y1="2" x2="12" y2="22" />
     <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
   </svg>
 )
 
 const BuildingIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
     <path d="M3 21h18" />
     <path d="M9 8h1" />
     <path d="M9 12h1" />
@@ -21,7 +21,7 @@ const BuildingIcon = () => (
 )
 
 const DocumentIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
     <path d="M14 2v6h6" />
     <path d="M16 13H8" />
@@ -31,53 +31,90 @@ const DocumentIcon = () => (
 )
 
 const EnvelopeIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
     <rect width="20" height="16" x="2" y="4" rx="2" />
     <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
   </svg>
 )
 
-const ctaCardsData = [
-  {
-    icon: <DollarIcon />,
-    title: 'View Pricing',
-    description: 'Transparent, usage-based pricing. Pay only for active subscriptions with no hidden fees.',
-    buttonLabel: 'See pricing plans',
-    href: '#pricing'
-  },
+interface CTACardData {
+  icon: React.ReactNode
+  title: string
+  description: string
+  buttonLabel: string
+  href: string
+  variant: CTACardVariant
+}
+
+const ctaCardsData: CTACardData[] = [
   {
     icon: <BuildingIcon />,
     title: 'Become a Merchant',
-    description: 'Start accepting recurring payments. Join Stellabill and offer subscription plans to your customers.',
+    description:
+      'Start accepting recurring payments. Join Stellabill and offer subscription plans to your customers.',
     buttonLabel: 'Get started',
-    href: '/dashboard'
+    href: '/dashboard',
+    variant: 'primary',
+  },
+  {
+    icon: <DollarIcon />,
+    title: 'View Pricing',
+    description:
+      'Transparent, usage-based pricing. Pay only for active subscriptions with no hidden fees.',
+    buttonLabel: 'See pricing plans',
+    href: '#pricing',
+    variant: 'secondary',
   },
   {
     icon: <DocumentIcon />,
     title: 'Read Documentation',
-    description: 'Complete API reference, integration guides, and smart contract documentation for developers.',
+    description:
+      'Complete API reference, integration guides, and smart contract documentation for developers.',
     buttonLabel: 'Browse docs',
-    href: '#docs'
+    href: '#docs',
+    variant: 'secondary',
   },
   {
     icon: <EnvelopeIcon />,
     title: 'Contact Sales',
-    description: 'Custom enterprise solutions with dedicated support, SLAs, and volume pricing.',
+    description:
+      'Custom enterprise solutions with dedicated support, SLAs, and volume pricing.',
     buttonLabel: 'Get in touch',
-    href: '#contact'
-  }
+    href: '#contact',
+    variant: 'secondary',
+  },
 ]
 
 export default function CTACards() {
   return (
-    <section style={{ padding: '4rem 0' }}>
+    <section
+      style={{ padding: 'clamp(2rem, 6vw, 4rem) clamp(1rem, 4vw, 1.5rem)' }}
+      aria-labelledby="cta-cards-heading"
+      data-testid="cta-cards"
+    >
+      <h2
+        id="cta-cards-heading"
+        style={{
+          position: 'absolute',
+          width: '1px',
+          height: '1px',
+          padding: 0,
+          margin: '-1px',
+          overflow: 'hidden',
+          clip: 'rect(0, 0, 0, 0)',
+          whiteSpace: 'nowrap',
+          border: 0,
+        }}
+      >
+        Ways to get started
+      </h2>
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '1.5rem',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+          gap: 'clamp(1rem, 2.5vw, 1.5rem)',
           maxWidth: '1280px',
-          margin: '0 auto'
+          margin: '0 auto',
         }}
         className="cta-cards-grid"
       >
@@ -89,6 +126,7 @@ export default function CTACards() {
             description={card.description}
             buttonLabel={card.buttonLabel}
             href={card.href}
+            variant={card.variant}
           />
         ))}
       </div>
@@ -99,13 +137,13 @@ export default function CTACards() {
             grid-template-columns: repeat(4, 1fr) !important;
           }
         }
-        
+
         @media (min-width: 768px) and (max-width: 1023px) {
           .cta-cards-grid {
             grid-template-columns: repeat(2, 1fr) !important;
           }
         }
-        
+
         @media (max-width: 767px) {
           .cta-cards-grid {
             grid-template-columns: 1fr !important;
