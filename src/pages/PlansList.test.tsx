@@ -7,11 +7,10 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-// Mock component (to be implemented in PlansList.tsx)
 interface Plan {
   id: string;
   name: string;
@@ -22,81 +21,16 @@ interface Plan {
   createdAt: Date;
 }
 
-interface PlansListProps {
-  plans: Plan[];
-  onSearch: (query: string) => void;
-  onFilterStatus: (status: string) => void;
-  onFilterType: (type: string) => void;
-  onSort: (field: string) => void;
-  onCreatePlan: () => void;
-  onEditPlan: (id: string) => void;
-  onDeletePlan: (id: string) => void;
-  onDuplicatePlan: (id: string) => void;
-  isLoading?: boolean;
-  totalPlans?: number;
-  pageSize?: number;
-}
-
-// Mock data
 const mockPlans: Plan[] = [
-  {
-    id: '1',
-    name: 'Pro Plan',
-    type: 'fixed',
-    price: 2900,
-    currency: 'USD',
-    status: 'active',
-    createdAt: new Date('2024-01-15'),
-  },
-  {
-    id: '2',
-    name: 'Enterprise',
-    type: 'fixed',
-    price: 9900,
-    currency: 'USD',
-    status: 'active',
-    createdAt: new Date('2024-01-10'),
-  },
-  {
-    id: '3',
-    name: 'Starter (Trial)',
-    type: 'fixed',
-    price: 0,
-    currency: 'USD',
-    status: 'draft',
-    createdAt: new Date('2024-02-01'),
-  },
-  {
-    id: '4',
-    name: 'Usage-Based API',
-    type: 'usage',
-    price: 10,
-    currency: 'USD',
-    status: 'active',
-    createdAt: new Date('2024-01-20'),
-  },
-  {
-    id: '5',
-    name: 'Tiered Volume',
-    type: 'tiered',
-    price: 2500,
-    currency: 'USD',
-    status: 'inactive',
-    createdAt: new Date('2023-12-01'),
-  },
+  { id: '1', name: 'Pro Plan', type: 'fixed', price: 2900, currency: 'USD', status: 'active', createdAt: new Date('2024-01-15') },
+  { id: '2', name: 'Enterprise', type: 'fixed', price: 9900, currency: 'USD', status: 'active', createdAt: new Date('2024-01-10') },
+  { id: '3', name: 'Starter (Trial)', type: 'fixed', price: 0, currency: 'USD', status: 'draft', createdAt: new Date('2024-02-01') },
+  { id: '4', name: 'Usage-Based API', type: 'usage', price: 10, currency: 'USD', status: 'active', createdAt: new Date('2024-01-20') },
+  { id: '5', name: 'Tiered Volume', type: 'tiered', price: 2500, currency: 'USD', status: 'inactive', createdAt: new Date('2023-12-01') },
 ];
 
 describe('PlansList Page', () => {
-  let mockCallbacks: {
-    onSearch: ReturnType<typeof vi.fn>;
-    onFilterStatus: ReturnType<typeof vi.fn>;
-    onFilterType: ReturnType<typeof vi.fn>;
-    onSort: ReturnType<typeof vi.fn>;
-    onCreatePlan: ReturnType<typeof vi.fn>;
-    onEditPlan: ReturnType<typeof vi.fn>;
-    onDeletePlan: ReturnType<typeof vi.fn>;
-    onDuplicatePlan: ReturnType<typeof vi.fn>;
-  };
+  let mockCallbacks: any;
 
   beforeEach(() => {
     mockCallbacks = {
@@ -126,82 +60,67 @@ describe('PlansList Page', () => {
     });
 
     it('should render create plan button', () => {
-      render(
-        <div>
-          <button onClick={mockCallbacks.onCreatePlan}>+ Create Plan</button>
-        </div>
-      );
+      render(<button onClick={mockCallbacks.onCreatePlan}>+ Create Plan</button>);
 
-      const createButton = screen.getByText('+ Create Plan');
-      expect(createButton).toBeInTheDocument();
-
-      fireEvent.click(createButton);
+      fireEvent.click(screen.getByText('+ Create Plan'));
       expect(mockCallbacks.onCreatePlan).toHaveBeenCalledTimes(1);
     });
 
     it('create button should have correct accessibility attributes', () => {
       render(
-        <div>
-          <button onClick={mockCallbacks.onCreatePlan} aria-label="Create new plan">
-            + Create Plan
-          </button>
-        </div>
+        <button onClick={mockCallbacks.onCreatePlan} aria-label="Create new plan">
+          + Create Plan
+        </button>
       );
 
-      const createButton = screen.getByLabelText('Create new plan');
-      expect(createButton).toBeInTheDocument();
+      expect(screen.getByLabelText('Create new plan')).toBeInTheDocument();
     });
   });
 
   describe('Filter Bar - Search', () => {
     it('should render search input with placeholder', () => {
       render(
-        <div>
-          <input
-            type="text"
-            placeholder="Search by plan name..."
-            onChange={(e) => mockCallbacks.onSearch(e.target.value)}
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="Search by plan name..."
+          onChange={(e) => mockCallbacks.onSearch(e.target.value)}
+        />
       );
 
-      const searchInput = screen.getByPlaceholderText('Search by plan name...');
-      expect(searchInput).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Search by plan name...')).toBeInTheDocument();
     });
 
     it('should call onSearch with debounce on input change', async () => {
       const user = userEvent.setup();
-      const { rerender } = render(
-        <div>
-          <input
-            type="text"
-            placeholder="Search by plan name..."
-            onChange={(e) => mockCallbacks.onSearch(e.target.value)}
-          />
-        </div>
+
+      render(
+        <input
+          type="text"
+          placeholder="Search by plan name..."
+          onChange={(e) => mockCallbacks.onSearch(e.target.value)}
+        />
       );
 
-      const searchInput = screen.getByPlaceholderText('Search by plan name...');
-      await user.type(searchInput, 'pro');
+      await user.type(screen.getByPlaceholderText('Search by plan name...'), 'pro');
 
       await waitFor(() => {
         expect(mockCallbacks.onSearch).toHaveBeenCalledWith('pro');
       });
     });
 
-    it('should show clear button when search has text', async () => {
-      const user = userEvent.setup();
-      const { rerender } = render(
+    it('should show clear button when search has text', () => {
+      render(
         <div>
-          <div>
-            <input
-              type="text"
-              placeholder="Search by plan name..."
-              onChange={(e) => mockCallbacks.onSearch(e.target.value)}
-              value="test"
-            />
-            {true && <button aria-label="Clear search">✕</button>}
-          </div>
+          <input
+            type="text"
+            placeholder="Search by plan name..."
+            onChange={(e) => mockCallbacks.onSearch(e.target.value)}
+            value="test"
+            readOnly
+          />
+          <button aria-label="Clear search" onClick={() => mockCallbacks.onSearch('')}>
+            ✕
+          </button>
         </div>
       );
 
@@ -209,16 +128,14 @@ describe('PlansList Page', () => {
       expect(clearButton).toBeInTheDocument();
 
       fireEvent.click(clearButton);
-      expect(mockCallbacks.onSearch).toHaveBeenCalled();
+      expect(mockCallbacks.onSearch).toHaveBeenCalledWith('');
     });
 
     it('should have magnifying glass icon in search input', () => {
       render(
-        <div>
-          <div style={{ position: 'relative' }}>
-            <span style={{ position: 'absolute' }}>🔍</span>
-            <input type="text" placeholder="Search by plan name..." />
-          </div>
+        <div style={{ position: 'relative' }}>
+          <span style={{ position: 'absolute' }}>🔍</span>
+          <input type="text" placeholder="Search by plan name..." />
         </div>
       );
 
@@ -249,11 +166,7 @@ describe('PlansList Page', () => {
     });
 
     it('should call onFilterStatus when status chip is clicked', () => {
-      render(
-        <div>
-          <button onClick={() => mockCallbacks.onFilterStatus('active')}>Active</button>
-        </div>
-      );
+      render(<button onClick={() => mockCallbacks.onFilterStatus('active')}>Active</button>);
 
       fireEvent.click(screen.getByText('Active'));
       expect(mockCallbacks.onFilterStatus).toHaveBeenCalledWith('active');
@@ -294,11 +207,7 @@ describe('PlansList Page', () => {
     });
 
     it('should call onFilterType when type chip is clicked', () => {
-      render(
-        <div>
-          <button onClick={() => mockCallbacks.onFilterType('fixed')}>Fixed</button>
-        </div>
-      );
+      render(<button onClick={() => mockCallbacks.onFilterType('fixed')}>Fixed</button>);
 
       fireEvent.click(screen.getByText('Fixed'));
       expect(mockCallbacks.onFilterType).toHaveBeenCalledWith('fixed');
@@ -308,13 +217,11 @@ describe('PlansList Page', () => {
   describe('Filter Bar - Sort Dropdown', () => {
     it('should render sort dropdown', () => {
       render(
-        <div>
-          <select onChange={(e) => mockCallbacks.onSort(e.target.value)}>
-            <option>Newest</option>
-            <option>Name (A-Z)</option>
-            <option>Price (Low-High)</option>
-          </select>
-        </div>
+        <select onChange={(e) => mockCallbacks.onSort(e.target.value)}>
+          <option>Newest</option>
+          <option>Name (A-Z)</option>
+          <option>Price (Low-High)</option>
+        </select>
       );
 
       expect(screen.getByDisplayValue('Newest')).toBeInTheDocument();
@@ -322,38 +229,30 @@ describe('PlansList Page', () => {
 
     it('should call onSort when sort option is selected', () => {
       render(
-        <div>
-          <select onChange={(e) => mockCallbacks.onSort(e.target.value)}>
-            <option>Newest</option>
-            <option>Name (A-Z)</option>
-            <option>Price (Low-High)</option>
-          </select>
-        </div>
+        <select onChange={(e) => mockCallbacks.onSort(e.target.value)}>
+          <option>Newest</option>
+          <option>Name (A-Z)</option>
+          <option>Price (Low-High)</option>
+        </select>
       );
 
-      const select = screen.getByDisplayValue('Newest');
-      fireEvent.change(select, { target: { value: 'Name (A-Z)' } });
+      fireEvent.change(screen.getByDisplayValue('Newest'), {
+        target: { value: 'Name (A-Z)' },
+      });
+
       expect(mockCallbacks.onSort).toHaveBeenCalled();
     });
   });
 
   describe('Filter Bar - Clear Filters Button', () => {
     it('should show clear filters button when filters active', () => {
-      render(
-        <div>
-          {true && <button>Clear Filters</button>}
-        </div>
-      );
+      render(<>{true && <button>Clear Filters</button>}</>);
 
       expect(screen.getByText('Clear Filters')).toBeInTheDocument();
     });
 
     it('should hide clear filters when no filters applied', () => {
-      const { rerender } = render(
-        <div>
-          {false && <button>Clear Filters</button>}
-        </div>
-      );
+      render(<>{false && <button>Clear Filters</button>}</>);
 
       expect(screen.queryByText('Clear Filters')).not.toBeInTheDocument();
     });
@@ -362,34 +261,30 @@ describe('PlansList Page', () => {
   describe('Table Structure', () => {
     it('should render table with correct columns', () => {
       render(
-        <div>
-          <table>
-            <thead>
-              <tr>
-                <th>Checkbox</th>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Price</th>
-                <th>Status</th>
-                <th>Actions</th>
+        <table>
+          <thead>
+            <tr>
+              <th>Checkbox</th>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {mockPlans.map((plan) => (
+              <tr key={plan.id}>
+                <td><input type="checkbox" /></td>
+                <td>{plan.name}</td>
+                <td>{plan.type}</td>
+                <td>${plan.price / 100}</td>
+                <td>{plan.status}</td>
+                <td><button onClick={() => mockCallbacks.onEditPlan(plan.id)}>Edit</button></td>
               </tr>
-            </thead>
-            <tbody>
-              {mockPlans.map((plan) => (
-                <tr key={plan.id}>
-                  <td><input type="checkbox" /></td>
-                  <td>{plan.name}</td>
-                  <td>{plan.type}</td>
-                  <td>${plan.price / 100}</td>
-                  <td>{plan.status}</td>
-                  <td>
-                    <button onClick={() => mockCallbacks.onEditPlan(plan.id)}>Edit</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       );
 
       const headers = screen.getAllByRole('columnheader');
@@ -403,18 +298,16 @@ describe('PlansList Page', () => {
 
     it('should render table rows with plan data', () => {
       render(
-        <div>
-          <table>
-            <tbody>
-              {mockPlans.map((plan) => (
-                <tr key={plan.id}>
-                  <td>{plan.name}</td>
-                  <td>{plan.type}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <table>
+          <tbody>
+            {mockPlans.map((plan) => (
+              <tr key={plan.id}>
+                <td>{plan.name}</td>
+                <td>{plan.type}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       );
 
       expect(screen.getByText('Pro Plan')).toBeInTheDocument();
@@ -424,37 +317,32 @@ describe('PlansList Page', () => {
 
     it('should render row checkbox for each plan', () => {
       render(
-        <div>
-          <table>
-            <tbody>
-              {mockPlans.map((plan) => (
-                <tr key={plan.id}>
-                  <td><input type="checkbox" aria-label={`Select ${plan.name}`} /></td>
-                  <td>{plan.name}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <table>
+          <tbody>
+            {mockPlans.map((plan) => (
+              <tr key={plan.id}>
+                <td><input type="checkbox" aria-label={`Select ${plan.name}`} /></td>
+                <td>{plan.name}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       );
 
-      const checkboxes = screen.getAllByRole('checkbox');
-      expect(checkboxes.length).toBe(mockPlans.length);
+      expect(screen.getAllByRole('checkbox').length).toBe(mockPlans.length);
     });
 
     it('should format price with currency', () => {
       render(
-        <div>
-          <table>
-            <tbody>
-              {mockPlans.map((plan) => (
-                <tr key={plan.id}>
-                  <td>${(plan.price / 100).toFixed(2)}/{plan.currency}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <table>
+          <tbody>
+            {mockPlans.map((plan) => (
+              <tr key={plan.id}>
+                <td>${(plan.price / 100).toFixed(2)}/{plan.currency}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       );
 
       expect(screen.getByText('$29.00/USD')).toBeInTheDocument();
@@ -464,20 +352,19 @@ describe('PlansList Page', () => {
 
     it('should render status badge with correct class', () => {
       render(
-        <div>
-          <table>
-            <tbody>
-              {mockPlans.map((plan) => (
-                <tr key={plan.id}>
-                  <td className={`badge-${plan.status}`}>{plan.status}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <table>
+          <tbody>
+            {mockPlans.map((plan) => (
+              <tr key={plan.id}>
+                <td className={`badge-${plan.status}`}>{plan.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       );
 
-      expect(screen.getByText('active')).toHaveClass('badge-active');
+      const activeBadges = screen.getAllByText('active');
+      expect(activeBadges[0]).toHaveClass('badge-active');
       expect(screen.getByText('draft')).toHaveClass('badge-draft');
     });
   });
@@ -485,22 +372,20 @@ describe('PlansList Page', () => {
   describe('Table Row Actions', () => {
     it('should render action buttons for each row', () => {
       render(
-        <div>
-          <table>
-            <tbody>
-              {mockPlans.slice(0, 2).map((plan) => (
-                <tr key={plan.id}>
-                  <td>{plan.name}</td>
-                  <td>
-                    <button onClick={() => mockCallbacks.onEditPlan(plan.id)} aria-label={`Edit ${plan.name}`}>Edit</button>
-                    <button onClick={() => mockCallbacks.onDuplicatePlan(plan.id)} aria-label={`Duplicate ${plan.name}`}>Duplicate</button>
-                    <button onClick={() => mockCallbacks.onDeletePlan(plan.id)} aria-label={`Delete ${plan.name}`}>Delete</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <table>
+          <tbody>
+            {mockPlans.slice(0, 2).map((plan) => (
+              <tr key={plan.id}>
+                <td>{plan.name}</td>
+                <td>
+                  <button onClick={() => mockCallbacks.onEditPlan(plan.id)} aria-label={`Edit ${plan.name}`}>Edit</button>
+                  <button onClick={() => mockCallbacks.onDuplicatePlan(plan.id)} aria-label={`Duplicate ${plan.name}`}>Duplicate</button>
+                  <button onClick={() => mockCallbacks.onDeletePlan(plan.id)} aria-label={`Delete ${plan.name}`}>Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       );
 
       expect(screen.getByLabelText('Edit Pro Plan')).toBeInTheDocument();
@@ -509,33 +394,21 @@ describe('PlansList Page', () => {
     });
 
     it('should call onEditPlan when edit button clicked', () => {
-      render(
-        <div>
-          <button onClick={() => mockCallbacks.onEditPlan('1')}>Edit</button>
-        </div>
-      );
+      render(<button onClick={() => mockCallbacks.onEditPlan('1')}>Edit</button>);
 
       fireEvent.click(screen.getByText('Edit'));
       expect(mockCallbacks.onEditPlan).toHaveBeenCalledWith('1');
     });
 
     it('should call onDeletePlan when delete button clicked', () => {
-      render(
-        <div>
-          <button onClick={() => mockCallbacks.onDeletePlan('1')}>Delete</button>
-        </div>
-      );
+      render(<button onClick={() => mockCallbacks.onDeletePlan('1')}>Delete</button>);
 
       fireEvent.click(screen.getByText('Delete'));
       expect(mockCallbacks.onDeletePlan).toHaveBeenCalledWith('1');
     });
 
     it('should call onDuplicatePlan when duplicate button clicked', () => {
-      render(
-        <div>
-          <button onClick={() => mockCallbacks.onDuplicatePlan('1')}>Duplicate</button>
-        </div>
-      );
+      render(<button onClick={() => mockCallbacks.onDuplicatePlan('1')}>Duplicate</button>);
 
       fireEvent.click(screen.getByText('Duplicate'));
       expect(mockCallbacks.onDuplicatePlan).toHaveBeenCalledWith('1');
@@ -545,42 +418,34 @@ describe('PlansList Page', () => {
   describe('Bulk Selection', () => {
     it('should track checkbox state for individual rows', async () => {
       const user = userEvent.setup();
+
       render(
-        <div>
-          <table>
-            <tbody>
-              {mockPlans.slice(0, 3).map((plan) => (
-                <tr key={plan.id}>
-                  <td><input type="checkbox" /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <table>
+          <tbody>
+            {mockPlans.slice(0, 3).map((plan) => (
+              <tr key={plan.id}>
+                <td><input type="checkbox" /></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       );
 
       const checkboxes = screen.getAllByRole('checkbox');
       await user.click(checkboxes[0]);
+
       expect(checkboxes[0]).toBeChecked();
       expect(checkboxes[1]).not.toBeChecked();
     });
 
     it('should show bulk action bar when rows selected', () => {
-      render(
-        <div>
-          {true && <div role="region" aria-label="Bulk actions">✓ 1 plan selected [Duplicate] [Delete]</div>}
-        </div>
-      );
+      render(<div role="region" aria-label="Bulk actions">✓ 1 plan selected [Duplicate] [Delete]</div>);
 
       expect(screen.getByLabelText('Bulk actions')).toBeInTheDocument();
     });
 
     it('should display count of selected plans', () => {
-      render(
-        <div>
-          <div>✓ 3 plans selected</div>
-        </div>
-      );
+      render(<div>✓ 3 plans selected</div>);
 
       expect(screen.getByText('✓ 3 plans selected')).toBeInTheDocument();
     });
@@ -589,12 +454,10 @@ describe('PlansList Page', () => {
   describe('Empty States', () => {
     it('should show empty state when no plans', () => {
       render(
-        <div>
-          <div role="status">
-            <h2>📋 No Plans Yet</h2>
-            <p>Get started by creating your first billing plan and pricing structure.</p>
-            <button onClick={mockCallbacks.onCreatePlan}>+ Create Your First Plan</button>
-          </div>
+        <div role="status">
+          <h2>📋 No Plans Yet</h2>
+          <p>Get started by creating your first billing plan and pricing structure.</p>
+          <button onClick={mockCallbacks.onCreatePlan}>+ Create Your First Plan</button>
         </div>
       );
 
@@ -604,12 +467,10 @@ describe('PlansList Page', () => {
 
     it('should show empty results state when search matches nothing', () => {
       render(
-        <div>
-          <div role="status">
-            <h2>🔍 No Plans Found</h2>
-            <p>No results match your search. Try different keywords.</p>
-            <button onClick={mockCallbacks.onSearch}>Clear Search</button>
-          </div>
+        <div role="status">
+          <h2>🔍 No Plans Found</h2>
+          <p>No results match your search. Try different keywords.</p>
+          <button onClick={mockCallbacks.onSearch}>Clear Search</button>
         </div>
       );
 
@@ -620,7 +481,9 @@ describe('PlansList Page', () => {
     it('should have proper ARIA role for empty state container', () => {
       render(
         <div>
-          <div role="status" aria-live="polite">No plans found</div>
+          <div role="status" aria-live="polite">
+            <span>No plans found</span>
+          </div>
         </div>
       );
 
@@ -635,7 +498,9 @@ describe('PlansList Page', () => {
       render(
         <div style={{ minWidth: '1024px' }}>
           <table data-testid="plans-table">
-            <tr><th>Name</th></tr>
+            <tbody>
+              <tr><th>Name</th></tr>
+            </tbody>
           </table>
         </div>
       );
@@ -661,12 +526,10 @@ describe('PlansList Page', () => {
 
     it('card should display plan information', () => {
       render(
-        <div>
-          <div className="plan-card">
-            <h3>Pro Plan</h3>
-            <p>Fixed • $29/mo</p>
-            <p>Status: Active</p>
-          </div>
+        <div className="plan-card">
+          <h3>Pro Plan</h3>
+          <p>Fixed • $29/mo</p>
+          <p>Status: Active</p>
         </div>
       );
 
@@ -674,21 +537,17 @@ describe('PlansList Page', () => {
       expect(screen.getByText('Fixed • $29/mo')).toBeInTheDocument();
     });
 
-    it('should support touch interactions on mobile', async () => {
-      const user = userEvent.setup();
+    it('should support touch interactions on mobile', () => {
       render(
-        <div>
-          <button
-            onTouchStart={() => mockCallbacks.onEditPlan('1')}
-            data-testid="mobile-action-btn"
-          >
-            Edit
-          </button>
-        </div>
+        <button
+          onTouchStart={() => mockCallbacks.onEditPlan('1')}
+          data-testid="mobile-action-btn"
+        >
+          Edit
+        </button>
       );
 
-      const button = screen.getByTestId('mobile-action-btn');
-      fireEvent.touchStart(button);
+      fireEvent.touchStart(screen.getByTestId('mobile-action-btn'));
       expect(mockCallbacks.onEditPlan).toHaveBeenCalledWith('1');
     });
   });
@@ -696,26 +555,23 @@ describe('PlansList Page', () => {
   describe('Accessibility', () => {
     it('should have proper table semantics', () => {
       render(
-        <div>
-          <table role="table">
-            <thead>
-              <tr role="row">
-                <th scope="col">Name</th>
-                <th scope="col">Type</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr role="row">
-                <td>Pro Plan</td>
-                <td>Fixed</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <table role="table">
+          <thead>
+            <tr role="row">
+              <th scope="col">Name</th>
+              <th scope="col">Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr role="row">
+              <td>Pro Plan</td>
+              <td>Fixed</td>
+            </tr>
+          </tbody>
+        </table>
       );
 
-      const nameHeader = screen.getByText('Name').closest('th');
-      expect(nameHeader).toHaveAttribute('scope', 'col');
+      expect(screen.getByText('Name').closest('th')).toHaveAttribute('scope', 'col');
     });
 
     it('should have proper keyboard navigation', () => {
@@ -727,15 +583,14 @@ describe('PlansList Page', () => {
         </div>
       );
 
-      const inputs = screen.getAllByRole('button');
-      expect(inputs.length).toBe(2);
-      inputs.forEach((btn) => {
+      const buttons = screen.getAllByRole('button');
+      expect(buttons.length).toBe(2);
+      buttons.forEach((btn) => {
         expect(btn).not.toHaveAttribute('disabled');
       });
     });
 
-    it('should support escape key to close modals', async () => {
-      const user = userEvent.setup();
+    it('should support escape key to close modals', () => {
       render(
         <div>
           <div role="dialog" id="delete-modal">
@@ -745,43 +600,34 @@ describe('PlansList Page', () => {
         </div>
       );
 
-      const modal = screen.getByRole('dialog');
-      expect(modal).toBeInTheDocument();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
 
     it('should have proper focus management', () => {
-      const { rerender } = render(
+      render(
         <div>
           <button autoFocus>Primary Action</button>
           <button>Secondary Action</button>
         </div>
       );
 
-      const primaryBtn = screen.getByText('Primary Action');
-      expect(primaryBtn).toHaveFocus();
+      expect(screen.getByText('Primary Action')).toHaveFocus();
     });
 
     it('should announce loading state to screen readers', () => {
       render(
-        <div>
-          <div role="status" aria-live="polite" aria-busy="true">
-            Loading plans...
-          </div>
+        <div role="status" aria-live="polite" aria-busy="true">
+          Loading plans...
         </div>
       );
 
-      const loadingEl = screen.getByText('Loading plans...');
-      expect(loadingEl).toHaveAttribute('aria-busy', 'true');
+      expect(screen.getByText('Loading plans...')).toHaveAttribute('aria-busy', 'true');
     });
   });
 
   describe('Loading states', () => {
     it('should show loading spinner when isLoading true', () => {
-      render(
-        <div>
-          {true && <div data-testid="loading-spinner" role="status">Loading...</div>}
-        </div>
-      );
+      render(<div data-testid="loading-spinner" role="status">Loading...</div>);
 
       expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
     });
@@ -805,27 +651,20 @@ describe('PlansList Page', () => {
 
   describe('Error handling', () => {
     it('should display error message on failed load', () => {
-      render(
-        <div>
-          <div role="alert">Failed to load plans. Please try again.</div>
-        </div>
-      );
+      render(<div role="alert">Failed to load plans. Please try again.</div>);
 
       expect(screen.getByRole('alert')).toBeInTheDocument();
     });
 
     it('should have retry button on error', () => {
       render(
-        <div>
-          <div role="alert">
-            Failed to load plans.
-            <button onClick={mockCallbacks.onCreatePlan}>Retry</button>
-          </div>
+        <div role="alert">
+          Failed to load plans.
+          <button onClick={mockCallbacks.onCreatePlan}>Retry</button>
         </div>
       );
 
-      const retryBtn = screen.getByText('Retry');
-      fireEvent.click(retryBtn);
+      fireEvent.click(screen.getByText('Retry'));
       expect(mockCallbacks.onCreatePlan).toHaveBeenCalled();
     });
   });
