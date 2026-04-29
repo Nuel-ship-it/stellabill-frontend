@@ -1,0 +1,113 @@
+@import './tokens.css';
+
+/*  Container */
+.sb-container {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: var(--grid-margin-sm);
+}
+
+@media (min-width: 480px) {
+  .sb-container { padding-inline: var(--grid-margin-md); }
+}
+
+@media (min-width: 768px) {
+  .sb-container {
+    max-width: 768px;
+    padding-inline: var(--grid-margin-md);
+  }
+}
+
+@media (min-width: 1024px) {
+  .sb-container {
+    max-width: 1024px;
+    padding-inline: var(--grid-margin-lg);
+  }
+}
+
+@media (min-width: 1280px) {
+  .sb-container {
+    max-width: 1280px;
+    padding-inline: var(--grid-margin-xl);
+  }
+}
+
+@media (min-width: 1536px) {
+  .sb-container { max-width: 1440px; }
+}
+
+/*  Grid */
+.sb-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), 1fr);
+  gap: var(--grid-gutter);
+}
+
+/* Responsive column helpers */
+.sb-col-1  { grid-column: span 1;  }
+.sb-col-2  { grid-column: span 2;  }
+.sb-col-3  { grid-column: span 3;  }
+.sb-col-4  { grid-column: span 4;  }
+.sb-col-5  { grid-column: span 5;  }
+.sb-col-6  { grid-column: span 6;  }
+.sb-col-7  { grid-column: span 7;  }
+.sb-col-8  { grid-column: span 8;  }
+.sb-col-9  { grid-column: span 9;  }
+.sb-col-10 { grid-column: span 10; }
+.sb-col-11 { grid-column: span 11; }
+.sb-col-12 { grid-column: span 12; }
+
+/* On mobile, most cols collapse to full width */
+@media (max-width: 767px) {
+  .sb-col-1,
+  .sb-col-2,
+  .sb-col-3,
+  .sb-col-4,
+  .sb-col-5,
+  .sb-col-6  { grid-column: span 12; }
+
+  .sb-col-7,
+  .sb-col-8,
+  .sb-col-9  { grid-column: span 12; }
+
+  .sb-col-10,
+  .sb-col-11,
+  .sb-col-12 { grid-column: span 12; }
+}
+
+@media (min-width: 480px) and (max-width: 767px) {
+  .sb-col-sm-6  { grid-column: span 6;  }
+  .sb-col-sm-12 { grid-column: span 12; }
+}
+
+/* Section spacing*/
+.sb-section {
+  padding-block: var(--space-section);
+}
+
+.sb-section--sm {
+  padding-block: var(--space-component);
+}
+
+.sb-section--lg {
+  padding-block: clamp(5rem, 10vw, 10rem);
+}
+
+/* Stack utility */
+.sb-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-element);
+}
+
+.sb-stack--sm { gap: var(--space-4); }
+.sb-stack--md { gap: var(--space-8); }
+.sb-stack--lg { gap: var(--space-12); }
+
+/*  Cluster utility  */
+.sb-cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: center;
+}

@@ -1,0 +1,138 @@
+@import './tokens.css';
+
+/* Base reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  font-size: 16px;           /* baseline — never change */
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-family-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-regular);
+  line-height: var(--leading-normal);
+  letter-spacing: var(--tracking-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/*  Heading scale  */
+h1, .sb-h1 {
+  font-family: var(--font-family-display);
+  font-size: var(--text-5xl);
+  font-weight: var(--font-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+}
+
+h2, .sb-h2 {
+  font-family: var(--font-family-display);
+  font-size: var(--text-4xl);
+  font-weight: var(--font-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+}
+
+h3, .sb-h3 {
+  font-family: var(--font-family-display);
+  font-size: var(--text-3xl);
+  font-weight: var(--font-semibold);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-normal);
+}
+
+h4, .sb-h4 {
+  font-family: var(--font-family-display);
+  font-size: var(--text-2xl);
+  font-weight: var(--font-semibold);
+  line-height: var(--leading-snug);
+}
+
+h5, .sb-h5 {
+  font-family: var(--font-family-display);
+  font-size: var(--text-xl);
+  font-weight: var(--font-medium);
+  line-height: var(--leading-normal);
+}
+
+h6, .sb-h6 {
+  font-family: var(--font-family-display);
+  font-size: var(--text-lg);
+  font-weight: var(--font-medium);
+  line-height: var(--leading-normal);
+}
+
+/* Body copy */
+.sb-body-lg {
+  font-size: var(--text-lg);
+  line-height: var(--leading-relaxed);
+}
+
+.sb-body {
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+}
+
+.sb-body-sm {
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+
+/* Display / hero */
+.sb-display {
+  font-family: var(--font-family-display);
+  font-size: clamp(2.5rem, 5vw + 1rem, 5rem);
+  font-weight: var(--font-bold);
+  line-height: var(--leading-none);
+  letter-spacing: var(--tracking-tighter);
+}
+
+/* Label / caption  */
+.sb-label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+}
+
+.sb-caption {
+  font-size: var(--text-xs);
+  line-height: var(--leading-relaxed);
+}
+
+/* Code */
+code, kbd, samp, pre {
+  font-family: var(--font-family-mono);
+  font-size: 0.875em;
+}
+
+/* Utilities */
+.sb-text-left    { text-align: left;   }
+.sb-text-center  { text-align: center; }
+.sb-text-right   { text-align: right;  }
+
+.sb-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sb-balance { text-wrap: balance; }
+
+/* Accessible focus style */
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
