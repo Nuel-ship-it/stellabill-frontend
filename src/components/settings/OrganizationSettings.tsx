@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import { Save, Building2, Mail, Globe, Users, Trash2, Edit2 } from 'lucide-react'
+import { Save, Building2, Users, Trash2, Edit2 } from 'lucide-react'
+import DangerZone, { DangerZoneItem } from '../common/DangerZone'
+import ConfirmDialog from '../common/ConfirmDialog'
 
 interface OrganizationData {
   name: string
@@ -392,141 +394,40 @@ export default function OrganizationSettings() {
       </div>
 
       {/* Danger Zone */}
-      <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-          <AlertTriangle size={20} style={{ color: '#ef4444' }} />
-          <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600, color: '#ef4444' }}>
-            Danger Zone
-          </h3>
-        </div>
+      <DangerZone description="Irreversible and destructive actions. Please review carefully before proceeding.">
+        <DangerZoneItem
+          title="Delete organization"
+          description={`Permanently delete "${orgData.name}" and all associated data. This action cannot be undone and will immediately cancel all active subscriptions.`}
+          actionLabel="Delete Organization"
+          actionIcon={<Trash2 size={14} aria-hidden="true" />}
+          onAction={() => setShowDeleteConfirmation(true)}
+        />
+      </DangerZone>
 
-        <div style={{ background: '#1a1a1a', borderRadius: '6px', padding: '1.5rem', border: '1px solid #dc2626' }}>
-          <div style={{ marginBottom: '1rem' }}>
-            <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 600, color: '#e2e8f0', marginBottom: '0.5rem' }}>
-              Delete Organization
-            </h4>
-            <p style={{ margin: 0, fontSize: '0.875rem', color: '#64748b', lineHeight: '1.5' }}>
-              Permanently delete your organization and all associated data. This action cannot be undone and will immediately cancel all active subscriptions.
-            </p>
-          </div>
-          
-          <button
-            onClick={() => setShowDeleteConfirmation(true)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.75rem 1.5rem',
-              borderRadius: '6px',
-              border: '1px solid #dc2626',
-              background: 'transparent',
-              color: '#ef4444',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              cursor: 'pointer',
-            }}
-          >
-            <Trash2 size={16} />
-            Delete Organization
-          </button>
-        </div>
-      </div>
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirmation && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.8)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-        }}>
-          <div style={{
-            background: '#1a1a2e',
-            borderRadius: '8px',
-            padding: '2rem',
-            maxWidth: '500px',
-            width: '90%',
-            border: '1px solid #2d2d44',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-              <AlertTriangle size={24} style={{ color: '#ef4444' }} />
-              <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 600, color: '#e2e8f0' }}>
-                Confirm Organization Deletion
-              </h3>
-            </div>
-            
-            <p style={{ margin: '0 0 1.5rem', color: '#64748b', lineHeight: '1.5' }}>
-              This action cannot be undone. This will permanently delete your organization "{orgData.name}" and all associated data including:
-            </p>
-            
-            <ul style={{ margin: '0 0 1.5rem', paddingLeft: '1.5rem', color: '#64748b' }}>
-              <li>All subscription plans and configurations</li>
-              <li>Customer data and subscription history</li>
-              <li>Billing information and payment methods</li>
-              <li>API keys and tokens</li>
-              <li>Team member access</li>
-            </ul>
-            
-            <div style={{ background: '#1a1a1a', borderRadius: '4px', padding: '1rem', marginBottom: '1.5rem' }}>
-              <p style={{ margin: 0, fontSize: '0.875rem', color: '#ef4444', fontWeight: 500 }}>
-                Type <strong>"DELETE"</strong> to confirm this action:
-              </p>
-              <input
-                type="text"
-                placeholder="Type DELETE to confirm"
-                style={{
-                  width: '100%',
-                  marginTop: '0.5rem',
-                  padding: '0.75rem',
-                  borderRadius: '4px',
-                  border: '1px solid #dc2626',
-                  background: '#0a0a0a',
-                  color: '#e2e8f0',
-                  fontSize: '0.875rem',
-                }}
-              />
-            </div>
-            
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
-              <button
-                onClick={() => setShowDeleteConfirmation(false)}
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  borderRadius: '6px',
-                  border: '1px solid #2d2d44',
-                  background: 'transparent',
-                  color: '#94a3b8',
-                  fontSize: '0.875rem',
-                  cursor: 'pointer',
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteOrganization}
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  borderRadius: '6px',
-                  border: 'none',
-                  background: '#dc2626',
-                  color: '#fff',
-                  fontSize: '0.875rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                }}
-              >
-                Delete Organization
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        isOpen={showDeleteConfirmation}
+        title="Confirm organization deletion"
+        description={
+          <>
+            This action cannot be undone. This will permanently delete your organization
+            <strong> "{orgData.name}" </strong>
+            and all associated data, including:
+          </>
+        }
+        consequences={[
+          'All subscription plans and configurations',
+          'Customer data and subscription history',
+          'Billing information and payment methods',
+          'API keys and tokens',
+          'Team member access',
+        ]}
+        confirmPhrase="DELETE"
+        confirmLabel="Delete organization"
+        loadingLabel="Deleting..."
+        cancelLabel="Cancel"
+        onClose={() => setShowDeleteConfirmation(false)}
+        onConfirm={handleDeleteOrganization}
+      />
     </div>
   )
 }

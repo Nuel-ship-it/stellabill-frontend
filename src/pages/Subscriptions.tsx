@@ -1,10 +1,11 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import PauseSubscriptionModal from "../components/PauseSubscriptionModal";
 import CancelSubscriptionModal from "../components/CancelSubscriptionModal";
-import { subscriptions } from "../api/client";
+import { subscriptions, ApiError } from "../api/client";
 import { Subscription } from "@/types/subscription";
 import UsageThisPeriod from "../components/UsageThisPeriod";
+import ErrorState from "../components/ErrorState";
 import "./Subscriptions.css";
 
 interface SubscriptionWithIcon extends Omit<Subscription, "icon"> {
@@ -131,7 +132,9 @@ const INITIAL_DATA: SubscriptionWithIcon[] = [
 ];
 
 export default function Subscriptions() {
-	const [data, setData] = useState<SubscriptionWithIcon[]>(INITIAL_DATA);
+	const [data, setData] = useState<SubscriptionWithIcon[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<ApiError | null>(null);
 	const [activeFilter, setActiveFilter] = useState("All");
 	const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -139,6 +142,35 @@ export default function Subscriptions() {
 	const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
 	const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 	const [isActionLoading, setIsActionLoading] = useState(false);
+
+	const fetchSubscriptions = useCallback(async () => {
+		setLoading(true);
+		setError(null);
+		try {
+			// Simulate API call
+			await new Promise((resolve, reject) => {
+				setTimeout(() => {
+					if (window.location.search.includes('simulate_error')) {
+						const err: ApiError = new Error('Failed to load subscriptions');
+						err.status = 500;
+						err.technicalDetails = 'The subscription service returned a malformed response. [Error Code: SUB-FETCH-ERR]';
+						reject(err);
+					} else {
+						resolve(true);
+					}
+				}, 1000);
+			});
+			setData(INITIAL_DATA);
+			setLoading(false);
+		} catch (err: any) {
+			setError(err);
+			setLoading(false);
+		}
+	}, []);
+
+	useEffect(() => {
+		fetchSubscriptions();
+	}, [fetchSubscriptions]);
 
 	const handleViewFullUsage = () => {
 		console.log("Navigate to full usage page");
@@ -160,6 +192,31 @@ export default function Subscriptions() {
 		Paused: data.filter((s) => s.status === "Paused").length,
 		Cancelled: data.filter((s) => s.status === "Cancelled").length,
 	};
+
+  if (loading && data.length === 0) {
+    return (
+      <div className="subscriptions-container">
+        <div className="loading-state" style={{ display: 'flex', justifyContent: 'center', padding: '5rem' }}>
+          <div className="spinner">Loading subscriptions...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="subscriptions-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+        <ErrorState 
+          title="Subscriptions Unavailable"
+          message={error.message}
+          technicalDetails={error.technicalDetails}
+          onRetry={fetchSubscriptions}
+          isRetrying={loading}
+          type={error.isOffline ? 'offline' : 'error'}
+        />
+      </div>
+    );
+  }
 
 	const handlePauseConfirm = async () => {
 		if (!selectedId) return;

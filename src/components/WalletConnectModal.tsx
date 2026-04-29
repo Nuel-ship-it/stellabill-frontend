@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useModalFocus } from "../hooks/useModalFocus";
 import "./WalletConnectModal.css";
 
 interface WalletConnectModalProps {
@@ -17,61 +18,15 @@ export default function WalletConnectModal({
 }: WalletConnectModalProps) {
   const [viewState, setViewState] = useState<"list" | "connecting" | "failed">(initialState);
   const modalRef = useRef<HTMLDivElement>(null);
-  const previousFocusRef = useRef<HTMLElement | null>(null);
 
-  // Reset state when opened and manage focus return
+  useModalFocus(modalRef, { isOpen, onClose });
+
+  // Reset state when opened
   useEffect(() => {
     if (isOpen) {
       setViewState(initialState);
-      previousFocusRef.current = document.activeElement as HTMLElement;
-    } else if (previousFocusRef.current) {
-      previousFocusRef.current.focus();
-      previousFocusRef.current = null;
     }
   }, [isOpen, initialState]);
-
-  // Focus trap and escape key logic
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-        return;
-      }
-
-      if (e.key === "Tab") {
-        const focusableElements = modalRef.current?.querySelectorAll(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        if (!focusableElements?.length) return;
-
-        const firstElement = focusableElements[0] as HTMLElement;
-        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
-
-        if (e.shiftKey && document.activeElement === firstElement) {
-          lastElement.focus();
-          e.preventDefault();
-        } else if (!e.shiftKey && document.activeElement === lastElement) {
-          firstElement.focus();
-          e.preventDefault();
-        }
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    // Focus first element slightly after mount to ensure DOM is ready
-    const timer = setTimeout(() => {
-      const firstFocusable = modalRef.current?.querySelector("button");
-      firstFocusable?.focus();
-    }, 50);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      clearTimeout(timer);
-    };
-  }, [isOpen, onClose]);
 
   const handleFreighterConnect = () => {
     setViewState("connecting");
