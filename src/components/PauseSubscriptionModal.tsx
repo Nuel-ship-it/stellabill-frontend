@@ -1,4 +1,5 @@
-import { useEffect, useRef, MouseEvent } from 'react';
+import { useRef, MouseEvent } from 'react';
+import { useModalFocus } from '../hooks/useModalFocus';
 import './PauseSubscriptionModal.css';
 
 interface PauseSubscriptionModalProps {
@@ -15,53 +16,9 @@ export default function PauseSubscriptionModal({
     isLoading = false
 }: PauseSubscriptionModalProps) {
     const modalRef = useRef<HTMLDivElement>(null);
-    const previousFocusRef = useRef<HTMLElement | null>(null);
+    const initialFocusRef = useRef<HTMLButtonElement>(null);
 
-    useEffect(() => {
-        if (isOpen) {
-            previousFocusRef.current = document.activeElement as HTMLElement;
-            // Small delay to let the modal animate in before focusing
-            const timer = setTimeout(() => {
-                const firstBtn = modalRef.current?.querySelector('.pause-btn-cancel') as HTMLButtonElement;
-                firstBtn?.focus();
-            }, 50);
-            return () => clearTimeout(timer);
-        } else if (previousFocusRef.current) {
-            previousFocusRef.current.focus();
-        }
-    }, [isOpen]);
-
-    useEffect(() => {
-        if (!isOpen) return;
-
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') {
-                onClose();
-                return;
-            }
-
-            if (e.key === 'Tab') {
-                const focusable = modalRef.current?.querySelectorAll(
-                    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-                );
-                if (!focusable || focusable.length === 0) return;
-
-                const first = focusable[0] as HTMLElement;
-                const last = focusable[focusable.length - 1] as HTMLElement;
-
-                if (e.shiftKey && document.activeElement === first) {
-                    last.focus();
-                    e.preventDefault();
-                } else if (!e.shiftKey && document.activeElement === last) {
-                    first.focus();
-                    e.preventDefault();
-                }
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen, onClose]);
+    useModalFocus(modalRef, { isOpen, onClose, initialFocusRef });
 
     if (!isOpen) return null;
 
@@ -72,6 +29,7 @@ export default function PauseSubscriptionModal({
             role="dialog"
             aria-modal="true"
             aria-labelledby="pause-modal-title"
+            aria-describedby="pause-modal-description"
         >
             <div className="pause-modal-content" ref={modalRef}>
                 <button
@@ -94,7 +52,7 @@ export default function PauseSubscriptionModal({
                 </div>
 
                 <h2 id="pause-modal-title" className="pause-title">Pause subscription?</h2>
-                <p className="pause-description">
+                <p id="pause-modal-description" className="pause-description">
                     You won't be charged until you resume. You can resume anytime.
                 </p>
 
@@ -138,6 +96,7 @@ export default function PauseSubscriptionModal({
 
                 <div className="pause-actions">
                     <button
+                        ref={initialFocusRef}
                         className="pause-btn pause-btn-cancel"
                         onClick={onClose}
                         disabled={isLoading}
