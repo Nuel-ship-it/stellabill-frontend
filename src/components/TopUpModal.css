@@ -20,7 +20,7 @@
   border: 1px solid #1e293b;
   border-radius: 24px;
   width: 100%;
-  max-width: 440px;
+  max-width: 520px;
   box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.8);
   padding: 1.5rem;
   color: #ffffff;
@@ -34,7 +34,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .topup-icon-box {
@@ -85,7 +85,34 @@
   color: #ffffff;
 }
 
-/* Balance Card */
+.topup-steps {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.topup-step {
+  background: #0a0a0a;
+  border: 1px solid #1f2937;
+  border-radius: 999px;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.topup-step.active,
+.topup-step.done {
+  background: #0d9488;
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.topup-step.done {
+  background: #065f46;
+}
+
 .balance-card {
   background: #061e1e;
   border: 1px solid #0d3d3d;
@@ -114,7 +141,10 @@
   font-weight: 600;
 }
 
-/* Quick Select */
+.step-content {
+  margin-bottom: 1.5rem;
+}
+
 .section-label {
   color: #94a3b8;
   font-size: 0.875rem;
@@ -170,7 +200,6 @@
   color: #ffffff;
 }
 
-/* Amount Input */
 .amount-field {
   background: #0a0a0a;
   border: 1px solid #1f2937;
@@ -220,7 +249,6 @@
   font-weight: 600;
 }
 
-/* Wallet Row */
 .wallet-row {
   background: #0a0a0a;
   border: 1px solid #1f2937;
@@ -245,7 +273,6 @@
   color: #ffffff;
 }
 
-/* Summary Block (Issue 66) */
 .summary-block {
   background: #020617;
   border: 1px solid #0d3d3d;
@@ -286,7 +313,99 @@
   font-size: 0.75rem;
 }
 
-/* Modal Actions */
+.guidance-box {
+  background: #0a0f17;
+  border: 1px solid #102e36;
+  border-radius: 16px;
+  padding: 1rem;
+  color: #cbd5e1;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.guidance-box strong {
+  color: #ffffff;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.review-content .review-block,
+.confirmation-content {
+  background: #061e1e;
+  border: 1px solid #0d3d3d;
+  border-radius: 16px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.review-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #0d3d3d;
+}
+
+.review-row:last-child {
+  border-bottom: none;
+}
+
+.review-label {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.review-value {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.confirmation-content {
+  text-align: center;
+}
+
+.confirmation-icon {
+  background: #002f28;
+  border: 1px solid #0d3d3d;
+  border-radius: 999px;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1rem auto;
+  display: grid;
+  place-items: center;
+  color: #2dd4bf;
+}
+
+.confirmation-content h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.5rem;
+}
+
+.confirmation-content p {
+  color: #cbd5e1;
+  margin: 0.5rem 0;
+}
+
+.alert-box {
+  background: #1f2937;
+  border: 1px solid #314155;
+  border-radius: 16px;
+  color: #f8fafc;
+  padding: 0.9rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.validation-note {
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  color: #cbd5e1;
+  padding: 0.75rem 0.9rem;
+  margin: 0 0 1rem 0;
+  font-size: 0.85rem;
+}
+
 .modal-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -327,18 +446,22 @@
   background: #0f766e;
 }
 
-/* Animations */
+.btn-primary:disabled {
+  background: #334155;
+  cursor: not-allowed;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
 @keyframes popIn {
-  from { 
+  from {
     opacity: 0;
     transform: scale(0.95) translateY(20px);
   }
-  to { 
+  to {
     opacity: 1;
     transform: scale(1) translateY(0);
   }
