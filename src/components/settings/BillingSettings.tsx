@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import { Save, CreditCard, Plus, Trash2, Download, AlertTriangle, Check } from 'lucide-react'
+import { Save, CreditCard, Plus, Trash2, Download } from 'lucide-react'
+import ConfirmDialog from '../common/ConfirmDialog'
+import DangerZone, { DangerZoneItem } from '../common/DangerZone'
 
 interface PaymentMethod {
   id: string
@@ -67,6 +69,10 @@ export default function BillingSettings() {
 
   const [isEditing, setIsEditing] = useState(false)
   const [showAddPaymentMethod, setShowAddPaymentMethod] = useState(false)
+  const [pendingRemovalId, setPendingRemovalId] = useState<string | null>(null)
+  const [showCancelSubscription, setShowCancelSubscription] = useState(false)
+
+  const pendingRemoval = paymentMethods.find((m) => m.id === pendingRemovalId) ?? null
 
   const handleSave = () => {
     console.log('Saving billing preferences:', billingPrefs)
@@ -78,9 +84,21 @@ export default function BillingSettings() {
     console.log('Setting default payment method:', id)
   }
 
-  const handleRemovePaymentMethod = (id: string) => {
-    // TODO: Implement remove logic with confirmation
-    console.log('Removing payment method:', id)
+  const requestRemovePaymentMethod = (id: string) => {
+    setPendingRemovalId(id)
+  }
+
+  const confirmRemovePaymentMethod = () => {
+    if (!pendingRemovalId) return
+    // TODO: Wire up real removal request
+    console.log('Removing payment method:', pendingRemovalId)
+    setPendingRemovalId(null)
+  }
+
+  const confirmCancelSubscription = () => {
+    // TODO: Wire up real subscription cancellation
+    console.log('Cancelling subscription...')
+    setShowCancelSubscription(false)
   }
 
   return (
@@ -370,7 +388,8 @@ export default function BillingSettings() {
                   </button>
                 )}
                 <button
-                  onClick={() => handleRemovePaymentMethod(method.id)}
+                  onClick={() => requestRemovePaymentMethod(method.id)}
+                  aria-label={`Remove payment method ending in ${method.last4}`}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -430,6 +449,54 @@ export default function BillingSettings() {
           </div>
         </div>
       </div>
+
+      {/* Danger Zone */}
+      <div style={{ marginTop: '2rem' }}>
+        <DangerZone description="Destructive billing actions. These cannot be undone — read each warning carefully.">
+          <DangerZoneItem
+            title="Cancel subscription"
+            description="Cancel your active subscription. Your remaining prepaid balance can be withdrawn before the end of the current billing period."
+            actionLabel="Cancel subscription"
+            actionIcon={<Trash2 size={14} aria-hidden="true" />}
+            onAction={() => setShowCancelSubscription(true)}
+          />
+        </DangerZone>
+      </div>
+
+      {/* Remove Payment Method Confirmation */}
+      <ConfirmDialog
+        isOpen={pendingRemovalId !== null}
+        title="Remove payment method?"
+        description={
+          pendingRemoval
+            ? `${pendingRemoval.brand} ending in ${pendingRemoval.last4} will no longer be available for charges.`
+            : 'This payment method will no longer be available for charges.'
+        }
+        consequences={[
+          'Auto-pay will fail if this is the last payment method on file.',
+          'Pending invoices may need to be paid manually.',
+        ]}
+        confirmLabel="Remove method"
+        cancelLabel="Keep method"
+        onClose={() => setPendingRemovalId(null)}
+        onConfirm={confirmRemovePaymentMethod}
+      />
+
+      {/* Cancel Subscription Confirmation */}
+      <ConfirmDialog
+        isOpen={showCancelSubscription}
+        title="Cancel subscription?"
+        description="Your subscription will be cancelled at the end of the current billing period. You can resubscribe at any time."
+        consequences={[
+          'You will not be charged again.',
+          'Access continues until the end of the current period.',
+          'Remaining prepaid balance can be withdrawn from your wallet.',
+        ]}
+        confirmLabel="Cancel subscription"
+        cancelLabel="Keep subscription"
+        onClose={() => setShowCancelSubscription(false)}
+        onConfirm={confirmCancelSubscription}
+      />
 
       {/* Add Payment Method Modal */}
       {showAddPaymentMethod && (
