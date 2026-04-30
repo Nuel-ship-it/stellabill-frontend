@@ -352,3 +352,66 @@
 .wallet-modal-overlay.connecting .wallet-modal-content {
   pointer-events: auto;
 }
+
+/* Error state actions */
+.wallet-failed-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.help-btn {
+  background: transparent;
+  color: #00D4FF;
+  border: 1px solid #00D4FF;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.help-btn:hover,
+.help-btn:focus-visible {
+  background: rgba(0, 212, 255, 0.1);
+  color: #F8FAFC;
+}
+
+.retry-btn {
+  background: linear-gradient(135deg, #00D4FF 0%, #3B82F6 100%);
+  color: white;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.retry-btn:hover,
+.retry-btn:focus-visible {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+}
+
+.cancel-btn {
+  background: #334155;
+  color: #94A3B8;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn:hover,
+.cancel-btn:focus-visible {
+  background: #475569;
+  color: #F8FAFC;
+}

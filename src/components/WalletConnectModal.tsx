@@ -1,60 +1,50 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { useModalFocus } from "../hooks/useModalFocus";
+import { ConnectionState } from "./ConnectButton";
 import "./WalletConnectModal.css";
 
 interface WalletConnectModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConnectFreighter?: () => void;
-  // This helps testing different states for the UI mockup
-  initialState?: "list" | "connecting" | "failed";
+  connectionState: ConnectionState;
+  errorMessage?: string;
+  onRetry?: () => void;
 }
 
 export default function WalletConnectModal({
   isOpen,
   onClose,
   onConnectFreighter,
-  initialState = "list",
+  connectionState,
+  errorMessage,
+  onRetry,
 }: WalletConnectModalProps) {
-  const [viewState, setViewState] = useState<"list" | "connecting" | "failed">(initialState);
   const modalRef = useRef<HTMLDivElement>(null);
 
   useModalFocus(modalRef, { isOpen, onClose });
 
-  // Reset state when opened
-  useEffect(() => {
-    if (isOpen) {
-      setViewState(initialState);
-    }
-  }, [isOpen, initialState]);
-
   const handleFreighterConnect = () => {
-    setViewState("connecting");
-    
-    // Simulate connection process
-    setTimeout(() => {
-      // For demo: 90% success rate, 10% failure to test the failure UI
-      if (Math.random() > 0.1) {
-        if (onConnectFreighter) {
-          onConnectFreighter();
-        }
-        onClose();
-      } else {
-        setViewState("failed");
-      }
-    }, 1500);
+    if (onConnectFreighter) {
+      onConnectFreighter();
+    }
   };
 
   if (!isOpen) return null;
 
   return (
     <div
-      className="wallet-modal-overlay"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      className={`wallet-modal-overlay ${connectionState === 'connecting' ? 'connecting' : ''}`}
+      onClick={(e) => {
+        if (e.target === e.currentTarget && connectionState !== 'connecting') {
+          onClose();
+        }
+      }}
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
-      aria-describedby="modal-description"
+      aria-describedby={connectionState === 'disconnected' ? 'modal-description' : undefined}
+      aria-busy={connectionState === 'connecting'}
     >
       <div className="wallet-modal-content" ref={modalRef}>
         {/* Stellar Icon Header */}
@@ -76,12 +66,12 @@ export default function WalletConnectModal({
         </button>
 
         <h2 id="modal-title" className="wallet-modal-title">
-          {viewState === "list" && <>Connect your<br />Stellar wallet</>}
-          {viewState === "connecting" && "Connecting..."}
-          {viewState === "failed" && "Connection Failed"}
+          {connectionState === 'disconnected' && <>Connect your<br />Stellar wallet</>}
+          {connectionState === 'connecting' && 'Connecting...'}
+          {connectionState === 'error' && 'Connection Failed'}
         </h2>
 
-        {viewState === "list" && (
+        {connectionState === 'disconnected' && (
           <>
             <p id="modal-description" className="wallet-description">
               Sign in with your wallet to manage subscriptions or accept payments.
@@ -148,7 +138,7 @@ export default function WalletConnectModal({
           </>
         )}
 
-        {viewState === "connecting" && (
+        {connectionState === 'connecting' && (
           <div className="wallet-connecting">
             <div className="spinner"></div>
             <h3 className="wallet-state-title">Confirm in Freighter</h3>
@@ -158,7 +148,7 @@ export default function WalletConnectModal({
           </div>
         )}
 
-        {viewState === "failed" && (
+        {connectionState === 'error' && (
           <div className="wallet-failed">
             <div className="wallet-failed-icon">
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#FF6B4A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -169,14 +159,19 @@ export default function WalletConnectModal({
             </div>
             <h3 className="wallet-state-title">Connection Rejected</h3>
             <p className="wallet-state-desc">
-              The connection request was rejected or failed. Please try again.
+              {errorMessage || 'The connection request was rejected or failed. Please try again.'}
             </p>
-            <button className="retry-btn" onClick={() => setViewState("list")}>
-              Try Again
-            </button>
-            <button className="cancel-btn" onClick={onClose}>
-              Cancel
-            </button>
+            <div className="wallet-failed-actions">
+              <button className="retry-btn" onClick={onRetry}>
+                Try Again
+              </button>
+              <button className="help-btn" onClick={() => window.open('https://docs.stellar.org/wallets', '_blank')}>
+                Get Help
+              </button>
+              <button className="cancel-btn" onClick={onClose}>
+                Cancel
+              </button>
+            </div>
           </div>
         )}
       </div>

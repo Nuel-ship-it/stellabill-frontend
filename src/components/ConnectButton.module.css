@@ -10,17 +10,60 @@
   font-weight: 700;
   font-size: 0.9375rem;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.2s ease;
   box-shadow: 0 4px 15px rgba(0, 211, 242, 0.2);
   white-space: nowrap;
+  position: relative;
+  gap: 0.5rem;
 }
 
-.connectButton:hover {
+.connectButton:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(0, 211, 242, 0.3);
   filter: brightness(1.05);
 }
 
-.connectButton:active {
+.connectButton:active:not(:disabled) {
   transform: translateY(0);
+}
+
+.connectButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.connectButton.connecting {
+  background: linear-gradient(90deg, #64748B 0%, #475569 100%);
+  color: white;
+}
+
+.connectButton.connected {
+  background: linear-gradient(90deg, #10B981 0%, #059669 100%);
+  color: white;
+}
+
+.connectButton.error {
+  background: linear-gradient(90deg, #EF4444 0%, #DC2626 100%);
+  color: white;
+  animation: shake 0.5s ease-in-out;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
 }
