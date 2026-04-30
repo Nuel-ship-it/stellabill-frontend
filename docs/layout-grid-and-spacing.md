@@ -272,3 +272,155 @@ and Recent Payments views.
    - Between cards / list rows: `--space-6` or `--space-8`
    - Between page sections: `--space-12` or `--space-16`
    - Hero / landing sections: `--space-20` or `--space-24`
+
+
+# Layout Grid & Spacing Guidelines
+
+> **Issue #166** — UI/UX: Add responsive spacing/typography audit and align to layout grid guidelines
+
+---
+
+## 1. Grid System
+
+Stellabill uses a **12-column fluid grid** built on CSS custom properties.
+
+| Breakpoint | Token name | Width | Side margin |
+|---|---|---|---|
+| xs (default) | — | 100% | `16px` (`--grid-margin-sm`) |
+| sm | `480px` | 100% | `24px` (`--grid-margin-md`) |
+| md | `768px` | `768px` | `24px` (`--grid-margin-md`) |
+| lg | `1024px` | `1024px` | `32px` (`--grid-margin-lg`) |
+| xl | `1280px` | `1280px` | `48px` (`--grid-margin-xl`) |
+| 2xl | `1536px` | `1440px` | `48px` |
+
+Gutter between columns: `--grid-gutter: 1.5rem` (24 px).
+
+### HTML usage
+
+```html
+<div class="sb-container">
+  <div class="sb-grid">
+    <div class="sb-col-8">Main content</div>
+    <div class="sb-col-4">Sidebar</div>
+  </div>
+</div>
+```
+
+On mobile, all columns collapse to full-width (`span 12`) automatically.
+
+---
+
+## 2. Spacing Scale (8-pt grid)
+
+All spacing values must come from the 8-pt grid. Use the CSS token or the nearest valid value.
+
+| Token | px equivalent |
+|---|---|
+| `--space-1` | 4 px |
+| `--space-2` | 8 px |
+| `--space-3` | 12 px |
+| `--space-4` | 16 px |
+| `--space-5` | 20 px |
+| `--space-6` | 24 px |
+| `--space-8` | 32 px |
+| `--space-10` | 40 px |
+| `--space-12` | 48 px |
+| `--space-16` | 64 px |
+| `--space-20` | 80 px |
+| `--space-24` | 96 px |
+
+### Fluid / contextual spacing
+
+For section-level spacing, prefer the fluid clamp tokens so layout breathes naturally across viewports:
+
+```css
+.my-section {
+  padding-block: var(--space-section);   /* clamp(3rem, 6vw, 6rem)   */
+}
+.my-component {
+  padding: var(--space-component);       /* clamp(1.5rem, 3vw, 3rem) */
+}
+```
+
+---
+
+## 3. Typography
+
+### Font families
+
+| Role | Family |
+|---|---|
+| Display / headings | `Sora`, `DM Sans` |
+| Body copy | `DM Sans`, `Sora` |
+| Monospace | `JetBrains Mono`, `Fira Code` |
+
+### Fluid type scale
+
+All font sizes use `clamp()` so they scale smoothly between breakpoints — no media-query overrides needed.
+
+| Token | Range |
+|---|---|
+| `--text-xs` | 11 – 12 px |
+| `--text-sm` | 13 – 15 px |
+| `--text-base` | 16 – 18 px |
+| `--text-lg` | 18 – 21 px |
+| `--text-xl` | 20 – 26 px |
+| `--text-2xl` | 23 – 31 px |
+| `--text-3xl` | 26 – 39 px |
+| `--text-4xl` | 29 – 49 px |
+| `--text-5xl` | 32 – 61 px |
+
+### Approved ranges per heading level
+
+| Heading | Min (px) | Max (px) |
+|---|---|---|
+| `<h1>` | 32 | 62 |
+| `<h2>` | 28 | 50 |
+| `<h3>` | 24 | 40 |
+| `<h4>` | 20 | 32 |
+| `<h5>` | 18 | 26 |
+| `<h6>` | 16 | 22 |
+
+### Rules
+
+1. **Always set `line-height`** on `<p>`, `<li>`, `<td>`, `<label>`, and `<span>`.  
+   Allowed values: `--leading-tight` (1.2) through `--leading-loose` (2).
+2. **Heading hierarchy** must not skip levels. `<h1>` → `<h3>` without `<h2>` is invalid.
+3. Use `text-wrap: balance` (`.sb-balance`) on headings ≤3 lines.
+
+---
+
+## 4. Audit Tooling
+
+A runtime audit utility lives at `src/utils/spacingTypographyAudit.js`.
+
+```js
+import { printAuditReport } from './src/utils/spacingTypographyAudit';
+printAuditReport();   // run in browser console or Playwright
+```
+
+It reports:
+- Off-grid spacing values (padding, margin, gap)
+- Font sizes outside the approved per-heading range
+- Missing explicit line-height on text elements
+- Heading hierarchy violations
+
+---
+
+## 5. CSS File Map
+
+```
+src/styles/
+  tokens.css      ← all design tokens (single source of truth)
+  layout.css      ← grid, container, section spacing, utility classes
+  typography.css  ← heading scale, body copy, label, code
+```
+
+Import order in your entry CSS:
+
+```css
+@import './tokens.css';
+@import './typography.css';
+@import './layout.css';
+/* component styles below */
+```

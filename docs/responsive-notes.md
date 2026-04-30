@@ -132,3 +132,68 @@ page-header-768.png
 sidebar-layout-375.png
 card-grid-1280.png
 ```
+# Responsive Notes
+
+> **Issue #166** — supplementary responsive-design guidance
+
+---
+
+## Breakpoint strategy
+
+Stellabill uses **mobile-first** media queries. Write base styles for the smallest viewport and add complexity upward with `min-width` queries.
+
+```css
+/* ✅ correct — mobile-first */
+.card { padding: var(--space-4); }
+@media (min-width: 768px) { .card { padding: var(--space-8); } }
+
+/* ❌ avoid — desktop-first */
+.card { padding: var(--space-8); }
+@media (max-width: 767px) { .card { padding: var(--space-4); } }
+```
+
+## Fluid values over breakpoint overrides
+
+Prefer `clamp()` for typography and spacing instead of stacking `@media` rules:
+
+```css
+/* ✅ preferred */
+font-size: clamp(1rem, 2.5vw, 1.5rem);
+
+/* 🆗 acceptable when semantics require it */
+@media (min-width: 1024px) { font-size: var(--text-xl); }
+```
+
+## Touch targets
+
+Interactive elements must be ≥ 44 × 44 px on touch devices (WCAG 2.5.5).
+
+```css
+.btn {
+  min-height: 44px;
+  min-width: 44px;
+  padding: var(--space-3) var(--space-6);
+}
+```
+
+## Images & media
+
+Always set `max-width: 100%` and `height: auto` on `<img>` elements to prevent overflow.
+
+```css
+img, video, canvas, svg { max-width: 100%; height: auto; display: block; }
+```
+
+## Text readability
+
+- Maximum line length: `60–75ch` on desktop.  
+- Minimum body font size: `16px` (never scale below 1rem).  
+- Sufficient colour contrast: ≥ 4.5:1 for body text (WCAG AA).
+
+## Testing checklist
+
+- [ ] Chrome DevTools device emulation: 375 px, 768 px, 1280 px, 1440 px
+- [ ] Physical iOS + Android device if available
+- [ ] `npm test` passes with ≥ 95 % coverage
+- [ ] Lighthouse score ≥ 90 on mobile
+- [ ] No horizontal scroll at any viewport width ≥ 320 px
